@@ -1,7 +1,6 @@
 # BrokenLink Checker
 
-Aplikasi desktop berbasis **JavaFX** untuk mendeteksi dan melaporkan tautan rusak (*broken links*) pada sebuah situs web.  
-Project ini dikembangkan sebagai bagian dari Tugas Akhir di Universitas Katolik Parahyangan.
+Aplikasi desktop berbasis **JavaFX** untuk mendeteksi dan melaporkan tautan rusak (*broken links*) pada sebuah situs web. Project ini dikembangkan sebagai bagian dari Tugas Akhir di Universitas Katolik Parahyangan.
 
 ## Deskripsi
 BrokenLink Checker memungkinkan pengguna memasukkan sebuah URL awal (*seed URL*), kemudian aplikasi akan melakukan **crawling** terhadap seluruh halaman yang berada dalam host yang sama, serta mengumpulkan:
