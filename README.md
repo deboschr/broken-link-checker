@@ -5,12 +5,12 @@ Aplikasi desktop berbasis **JavaFX** untuk mendeteksi dan melaporkan tautan rusa
 ## Deskripsi
 BrokenLink Checker memungkinkan pengguna memasukkan sebuah URL awal (*seed URL*), kemudian aplikasi akan melakukan **crawling** terhadap seluruh halaman yang berada dalam host yang sama, serta mengumpulkan:
 
-- **Halaman Web (Webpages)** => semua halaman valid yang berhasil dicrawl.
-- **Tautan Rusak (Broken Links)** => tautan yang mengembalikan kode error (HTTP 4xx/5xx) atau gagal diakses.
+- **Halaman Web (Webpages)** : semua halaman valid yang berhasil dicrawl.
+- **Tautan Rusak (Broken Links)** : tautan yang mengembalikan kode error (HTTP 4xx/5xx) atau gagal diakses.
 
 Hasil crawling ditampilkan dalam dua tabel:
-- **Tabel Webpages** => menampilkan URL, status code, jumlah tautan yang ditemukan, dan waktu akses.
-- **Tabel Broken Links** => menampilkan URL, status code, teks anchor, serta halaman sumber.
+- **Tabel Webpages** : menampilkan URL, status code, jumlah tautan yang ditemukan, dan waktu akses.
+- **Tabel Broken Links** : menampilkan URL, status code, teks anchor, serta halaman sumber.
 
 ## Fitur
 - Crawling situs web mulai dari seed URL.
