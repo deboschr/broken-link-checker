@@ -14,28 +14,31 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-
-
 import java.util.function.Consumer;
 
 public class Crawler {
 
-
-    private final String rootHost;                          // Untuk host dari seed url
-    private final Frontier frontier;                        // Menyimpan daftar webpage link yang akan di crawl
-    private final Set<String> repositories;                 // Memastikan semua link unik
+    private final String rootHost;      // host dari seed URL
+    private final Frontier frontier;    // antrian URL yang akan dicrawl
+    private final Set<String> repositories; // kumpulan URL supaya nggak ada yang dicek 2x
 
     private static final String USER_AGENT = "BrokenLinkChecker/1.0 (+https://github.com/jakeschr/BrokenLinkChecker; contact: 6182001060@student.unpar.ac.id)";
     private static final int TIMEOUT = 10000;
+
+    // HttpClient bawaan Java buat ngecek link non-webpage (pakai HEAD/GET)
     private static final HttpClient httpClient = HttpClient
             .newBuilder()
-            .followRedirects(HttpClient.Redirect.NORMAL)    // redirect jika mendapat status code redirect (301,302,303,307,308)
-            .connectTimeout(Duration.ofMillis(TIMEOUT))     // mengatur koneksi ke server
-            .version(HttpClient.Version.HTTP_1_1)
+            .followRedirects(HttpClient.Redirect.NORMAL)    // otomatis follow redirect (301,302,dst)
+            .connectTimeout(Duration.ofMillis(TIMEOUT))     // timeout koneksi
+            .version(HttpClient.Version.HTTP_1_1)           // pakai HTTP/1.1
             .build();
 
-
-
+    /**
+     * Constructor: bikin crawler baru dari seed URL.
+     * - Ambil host root dari seed.
+     * - Siapin set repository biar URL unik.
+     * - Masukin seed URL ke frontier supaya jadi titik awal crawl.
+     */
     public Crawler(String seedUrl) {
         this.rootHost = URI.create(seedUrl).getHost().toLowerCase();
         this.repositories = new HashSet<>();
@@ -44,89 +47,88 @@ public class Crawler {
         frontier.add(seedUrl);
     }
 
+    /**
+     * Fungsi utama buat ngecrawl.
+     * - Ambil URL dari frontier satu per satu.
+     * - Kalau URL baru maka request ke server terus ambil status + HTML.
+     * - Simpan hasil sebagai WebpageLink atau BrokenLink.
+     * - Ekstrak semua link dari halaman, lalu tentukan apakah link itu halaman lagi (lanjut crawl) atau link resource (cukup dicek status).
+     * - Setiap kali dapat hasil, dikirim lewat Consumer ke UI.
+     */
     public void crawl(Consumer<WebpageLink> streamWebpageLink,
                       Consumer<BrokenLink> streamBrokenLink) {
 
         while (!frontier.isEmpty()) {
-
             String webpageLink = frontier.next();
 
+            // skip kalau sudah pernah dicek
             if (!repositories.add(webpageLink)) {
                 continue;
             }
 
-            Document doc;               // untuk hasil parse html dari webpage
-            int wlStatusCode = 0;       // untuk status code dari hasil request ke webpage
+            Document doc;         // hasil HTML
+            int wlStatusCode = 0; // status code halaman
 
             try {
-
+                // request pakai Jsoup
                 Connection.Response res = Jsoup
-                        .connect(webpageLink)           // buat koneksi ke server
-                        .userAgent(USER_AGENT)          // menetapkan user agent
-                        .timeout(TIMEOUT)               // menetapkan timeout request
-                        .followRedirects(true)       // mengikuti redirect (default : true)
-                        .ignoreHttpErrors(true)      // tetap dapat response meski status code 4xx/5xx
-                        .execute();                     // kirim request ke server
+                        .connect(webpageLink)
+                        .userAgent(USER_AGENT)
+                        .timeout(TIMEOUT)
+                        .followRedirects(true)
+                        .ignoreHttpErrors(true) // walaupun 4xx/5xx tetap kasih response
+                        .execute();
 
-
-                // dapatkan status code dar
                 wlStatusCode = res.statusCode();
 
-                // jika error
+                // kalau error (>=400 atau 0), langsung dianggap broken
                 if (wlStatusCode >= 400 || wlStatusCode == 0) {
-                    // Stream hasil
                     streamBrokenLink.accept(new BrokenLink(webpageLink, wlStatusCode, "", ""));
                     continue;
                 }
 
-                // dapatkan dokumen html
+                // parse HTML
                 doc = res.parse();
 
+                // kalau gak ada elemen <html>, skip
                 if (doc.selectFirst("html") == null) {
                     continue;
                 }
 
-            } catch (Exception e) { // untuk network error, SSL, timeout, dll.
-                // Stream hasil
+            } catch (Exception e) {
+                // kalau network error, timeout, SSL error, dll
                 streamBrokenLink.accept(new BrokenLink(webpageLink, 0, e.getClass().getSimpleName(), ""));
                 continue;
             }
 
-
-
-            // Ekstrak semua link dari webpage
+            // ekstrak semua link di halaman
             List<BrokenLink> linksOnWebpage = extractLinks(doc);
 
-            // Stream hasil
+            // kirim data halaman yang berhasil dicrawl
             streamWebpageLink.accept(new WebpageLink(webpageLink, wlStatusCode, linksOnWebpage.size(), Instant.now()));
 
+            // proses tiap link yang ditemukan
             for (BrokenLink bl : linksOnWebpage) {
 
-                // jika url berpotensi menjadi webpage
+                // kalau link masih satu host (same domain) maka anggap ini berpotensi jadi halaman
                 if (isPotentialWebpage(bl.getUrl())) {
-
-                    // jika link belum di parse maka masukan ke frontier
                     if (!repositories.contains(bl.getUrl())) {
                         frontier.add(bl.getUrl());
                     }
                 }
-                // jika link bukan webpage
+                // kalau bukan halaman (misal gambar, css, js, dll.)
                 else {
-
                     if (!repositories.add(bl.getUrl())) {
                         continue;
                     }
 
-                    // cek link
+                    // cek status link
                     int blStatusCode = fetchUrl(bl.getUrl());
 
-                    // jika error
+                    // kalau rusak, update info & kirim ke stream
                     if (blStatusCode >= 400 || blStatusCode == 0) {
-
                         bl.setStatusCode(blStatusCode);
                         bl.setWebpageUrl(webpageLink);
-
-                        // Stream hasil
                         streamBrokenLink.accept(bl);
                     }
                 }
@@ -134,44 +136,42 @@ public class Crawler {
         }
     }
 
+    /**
+     * Ekstrak semua <a href> dari dokumen HTML.
+     * - Ambil absolute URL.
+     * - Bersihin URL (canonicalization).
+     * - Simpan sebagai BrokenLink dengan status 0 (belum dicek).
+     */
     private List<BrokenLink> extractLinks(Document doc) {
         List<BrokenLink> results = new ArrayList<>();
 
         for (Element a : doc.select("a[href]")) {
+            String absoluteUrl = a.attr("abs:href");              // ambil absolute URL
+            String cleanedUrl = URLCanonicalization(absoluteUrl); // normalisasi
 
-            // Ambil absolut url
-            String absoluteUrl = a.attr("abs:href");
+            if (cleanedUrl == null) continue;
 
-            // normalisasi url
-            String cleanedUrl = URLCanonicalization(absoluteUrl);
-
-            if (cleanedUrl == null) {
-                continue;
-            }
-
-            // Mengambil anchor text dari tantan
-            String anchorText = a.text().trim();
-
+            String anchorText = a.text().trim();                  // ambil teks anchor
             results.add(new BrokenLink(cleanedUrl, 0, anchorText, ""));
         }
-
         return results;
     }
 
+    /**
+     * Cek apakah URL potensial jadi halaman (bisa dicrawl lagi).
+     * Syarat:
+     * - host sama dengan seed
+     * - bukan file resource (jpg, png, css, js, pdf, dll.)
+     */
     private boolean isPotentialWebpage(String url) {
         try {
             URI uri = URI.create(url);
-
             String host = uri.getHost();
-
             if (host == null) return false;
 
-            // cek same host
             boolean isSameHost = host.equalsIgnoreCase(rootHost);
 
             String path = uri.getPath().toLowerCase();
-
-            // cek file resource dari path (bukan full URL string)
             boolean isFileResource =
                     path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".png")
                             || path.endsWith(".gif") || path.endsWith(".webp") || path.endsWith(".svg")
@@ -185,158 +185,90 @@ public class Crawler {
         }
     }
 
+    /**
+     * Membersihkan URL biar konsisten.
+     * - scheme ke lowercase, hanya http/https
+     * - host ke lowercase (support IDN)
+     * - hapus port default (80, 443)
+     * - hapus fragment (#...) karena gak dikirim ke server
+     */
     public static String URLCanonicalization(String rawUrl) {
-
-        /** ==================================================================
-         * - url input tidak boleh null atau string kosong
-         * - buat objek url melalui URI.create() agar kita bisa memecah komponen url
-         */
-
         if (rawUrl == null || rawUrl.trim().isEmpty()) return null;
 
         URI url;
-
         try {
             url = URI.create(rawUrl.trim());
         } catch (IllegalArgumentException e) {
             return rawUrl;
         }
 
-        /** ==================================================================
-         * SCHEME
-         * - ubah ke lowercase
-         * - wajib http/s
-         * - tidak boleh null
-         */
-
+        // scheme
         String scheme = url.getScheme();
-
-        if (scheme == null) {
-            return null;
-        }
-
-        if (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https")) {
-            return null;
-        }
-
-
+        if (scheme == null) return null;
+        if (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https")) return null;
         scheme = scheme.toLowerCase();
 
-        /** ==================================================================
-         * HOST
-         * - ubah ke lowercase
-         * - gunakan IDN (Internationalized Domain Name) agar bisa mendapatkan host yang menggunakan karekter non ASCII
-         * - tidak boleh null atau kosong (absolut url wajib memiliki host)
-         */
-
+        // host
         String host = url.getHost();
-
-        if (host == null || host.isEmpty()) {
-            return null;
-        }
-
+        if (host == null || host.isEmpty()) return null;
         try {
             host = IDN.toASCII(host).toLowerCase();
         } catch (Exception e) {
             return null;
         }
 
-        /** ==================================================================
-         * PORT
-         * - hapus port default http  = 80
-         * - hapus port default https = 443
-         * - ubah port jadi -1 agar tidak bertabrakan dengan nilai port valid
-         */
-
+        // port
         int port = url.getPort();
-        boolean isHttpPortExist = scheme.equals("http") && port == 80;
-        boolean isHttpsPortExist = scheme.equals("https") && port == 443;
-
-        if (isHttpPortExist || isHttpsPortExist) {
+        if ((scheme.equals("http") && port == 80) || (scheme.equals("https") && port == 443)) {
             port = -1;
         }
 
-
-        /** ==================================================================
-         * PATH
-         * - menggunakan getPath() agar langsung menghilangkan dot-segment resolution (/./ dan /../)
-         */
-
+        // path
         String path = url.getPath();
+        if (path == null) path = "";
 
-        if (path == null) {
-            path = "";
-        }
-
-        /** ==================================================================
-         * QUERY
-         * - menggunakan getRawQuery() agar mendapatkan query apa adanya
-         */
-
+        // query
         String query = url.getRawQuery();
 
-        /** ==================================================================
-         * REBUILD URL
-         * - tidak menyertakan userInfo karena tidak dibutuhkan
-         * - tidak menyertakan fragment karena tidak dikirim ke server
-         * - kembalikan url yang sudah bersih
-         */
-
         try {
-            /**
-             * Struktur URL menurut RFC 3986:
-             *
-             *   https://user:pass@www.example.com:8080/path/to/page.html?id=123&sort=asc#section2
-             *
-             *   scheme   : "https"
-             *   userinfo : "user:pass"
-             *   host     : "www.example.com"
-             *   port     : 8080
-             *   path     : "/path/to/page.html"
-             *   query    : "?id=123&sort=asc"
-             *   fragment : "#section2"
-             */
             URI cleanedUrl = new URI(scheme, null, host, port, path, query, null);
-
             return cleanedUrl.toASCIIString();
-
         } catch (URISyntaxException e) {
             return null;
         }
     }
 
+    /**
+     * Cek status code sebuah URL non-webpage.
+     * - Pertama coba pakai HEAD request (lebih ringan).
+     * - Kalau gagal (status 405, 501, 999), fallback pakai GET.
+     * - Kalau error (exception), return 0.
+     */
     private int fetchUrl(String url) {
         List<Integer> fallbackStatusCode = Arrays.asList(405, 501, 999);
 
         try {
             HttpRequest headReq = HttpRequest
                     .newBuilder(URI.create(url))
-                    .method("HEAD", HttpRequest.BodyPublishers.noBody())   // menggunakan method HEAD dan request tanpa body
-                    .header("User-Agent", USER_AGENT)                        // mengatur user agent
-                    .timeout(Duration.ofMillis(TIMEOUT))                                              // mengatur timeout request
+                    .method("HEAD", HttpRequest.BodyPublishers.noBody())
+                    .header("User-Agent", USER_AGENT)
+                    .timeout(Duration.ofMillis(TIMEOUT))
                     .build();
 
-            HttpResponse<Void> headRes = httpClient.send(
-                    headReq,                                    // objek request HEAD
-                    HttpResponse.BodyHandlers.discarding()      // mengabaikan response body
-            );
+            HttpResponse<Void> headRes = httpClient.send(headReq, HttpResponse.BodyHandlers.discarding());
+            int statusCode = headRes.statusCode();
 
-            int statusCode = headRes.statusCode();                  // ambil status code dari response HEAD
-
+            // fallback kalau HEAD nggak didukung
             if (fallbackStatusCode.contains(statusCode)) {
                 HttpRequest getReq = HttpRequest
                         .newBuilder(URI.create(url))
-                        .method("GET", HttpRequest.BodyPublishers.noBody())    // menggunakan method GET dan request tanpa body
-                        .header("User-Agent", USER_AGENT)                        // mengatur user agent
-                        .timeout(Duration.ofMillis(TIMEOUT))                                              // mengatur timeout request
+                        .method("GET", HttpRequest.BodyPublishers.noBody())
+                        .header("User-Agent", USER_AGENT)
+                        .timeout(Duration.ofMillis(TIMEOUT))
                         .build();
 
-                HttpResponse<Void> getRes = httpClient.send(
-                        getReq,                                 // objek request GET
-                        HttpResponse.BodyHandlers.discarding()  // mengabaikan response body
-                );
-
-                statusCode = getRes.statusCode();               // ambil status code dari response GET
+                HttpResponse<Void> getRes = httpClient.send(getReq, HttpResponse.BodyHandlers.discarding());
+                statusCode = getRes.statusCode();
             }
 
             return statusCode;
