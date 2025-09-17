@@ -1,8 +1,8 @@
 package com.unpar.brokenlinkchecker.models;
 
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.StringProperty;
 
 public class Link {
@@ -14,11 +14,11 @@ public class Link {
         this.statusCode = new SimpleIntegerProperty(statusCode);
     }
 
-    // property getters untuk TableView
+    // Properties
     public StringProperty urlProperty() { return url; }
     public IntegerProperty statusCodeProperty() { return statusCode; }
 
-    // getter/setter biasa
+    // Getters & Setters
     public String getUrl() { return url.get(); }
     public void setUrl(String value) { url.set(value); }
 

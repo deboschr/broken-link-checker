@@ -1,0 +1,31 @@
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 13px;
+}
+
+.tab-pane {
+    -fx-tab-min-width: 120px;
+    -fx-tab-max-width: 200px;
+}
+
+.table-view {
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1;
+    -fx-selection-bar: #1976d2;          /* warna baris terpilih */
+    -fx-selection-bar-text: white;       /* teks pada baris terpilih */
+}
+
+.table-column {
+    -fx-alignment: CENTER-LEFT;
+}
+
+.button {
+    -fx-background-color: #1976d2;
+    -fx-text-fill: white;
+    -fx-background-radius: 4;
+    -fx-padding: 5 15 5 15;
+}
+
+.button:hover {
+    -fx-background-color: #1565c0;
+}

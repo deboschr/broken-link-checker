@@ -4,17 +4,23 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class BrokenLink extends Link {
-    private final StringProperty source;
+    private final StringProperty anchorText;
+    private final StringProperty webpageUrl;
 
-    public BrokenLink(String url, int statusCode, String source) {
+    public BrokenLink(String url, int statusCode, String anchorText, String webpageUrl) {
         super(url, statusCode);
-        this.source = new SimpleStringProperty(source);
+        this.anchorText = new SimpleStringProperty(anchorText);
+        this.webpageUrl = new SimpleStringProperty(webpageUrl);
     }
 
-    // property getter untuk TableView
-    public StringProperty sourceProperty() { return source; }
+    // Properties
+    public StringProperty anchorTextProperty() { return anchorText; }
+    public StringProperty webpageUrlProperty() { return webpageUrl; }
 
-    // getter/setter biasa
-    public String getSource() { return source.get(); }
-    public void setSource(String value) { source.set(value); }
+    // Getters & Setters
+    public String getAnchorText() { return anchorText.get(); }
+    public void setAnchorText(String value) { anchorText.set(value); }
+
+    public String getWebpageUrl() { return webpageUrl.get(); }
+    public void setWebpageUrl(String value) { webpageUrl.set(value); }
 }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.unpar.brokenlinkchecker.Controller">
+
+    <!-- Bagian atas: input + tombol -->
+    <top>
+        <HBox spacing="10" style="-fx-padding: 10;">
+            <TextField fx:id="urlField" promptText="Enter Seed URL"/>
+            <Button fx:id="checkButton" text="Check" onAction="#onCheckClick"/>
+        </HBox>
+    </top>
+
+    <!-- Bagian tengah: TabPane -->
+    <center>
+        <TabPane>
+            <tabs>
+                <Tab text="Webpages">
+                    <TableView fx:id="webpageTable">
+                        <columns>
+                            <TableColumn fx:id="wpUrlColumn" text="URL" prefWidth="250"/>
+                            <TableColumn fx:id="wpStatusColumn" text="Status" prefWidth="80"/>
+                            <TableColumn fx:id="wpCountColumn" text="Links Count" prefWidth="100"/>
+                            <TableColumn fx:id="wpAccessTimeColumn" text="Access Time" prefWidth="200"/>
+                        </columns>
+                    </TableView>
+                </Tab>
+
+                <Tab text="Broken Links">
+                    <TableView fx:id="brokenTable">
+                        <columns>
+                            <TableColumn fx:id="blUrlColumn" text="URL" prefWidth="250"/>
+                            <TableColumn fx:id="blStatusColumn" text="Status" prefWidth="80"/>
+                            <TableColumn fx:id="blAnchorColumn" text="Anchor Text" prefWidth="150"/>
+                            <TableColumn fx:id="blSourceColumn" text="Source Page" prefWidth="250"/>
+                        </columns>
+                    </TableView>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
+</BorderPane>

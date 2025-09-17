@@ -6,8 +6,8 @@ plugins {
     id 'org.beryx.jlink' version '2.25.0'
 }
 
-group 'com.unpar'
-version '1.0-SNAPSHOT'
+group = 'com.unpar'
+version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -26,15 +26,16 @@ tasks.withType(JavaCompile) {
 
 application {
     mainModule = 'com.unpar.brokenlinkchecker'
-    mainClass = 'com.unpar.brokenlinkchecker.HelloApplication'
+    mainClass = 'com.unpar.brokenlinkchecker.App'
 }
 
 javafx {
-    version = '17.0.6'
+    version = '23'
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
 dependencies {
+    implementation 'org.jsoup:jsoup:1.17.2'
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
