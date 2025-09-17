@@ -21,36 +21,6 @@ Hasil crawling ditampilkan dalam dua tabel:
     - **Java HttpClient** untuk tautan non-halaman (gambar, CSS, JS, dsb.).
 - Antarmuka grafis berbasis JavaFX dengan `TableView` dan dukungan CSS.
 
-## Teknologi
-- **Java 23**
-- **JavaFX 17.0.6**
-- **Gradle 8.10**
-- **Jsoup 1.21.2**
-- **Java HttpClient (java.net.http)**
-
-## Struktur Proyek
-```
-broken-link-checker/
-├── build.gradle                           # Konfigurasi Gradle
-├── settings.gradle                        # Konfigurasi nama proyek
-├── src/
-│   └── main/
-│       ├── java/com/unpar/brokenlinkchecker/
-│       │   ├── App.java                   # Entry point utama aplikasi
-│       │   ├── Controller.java            # Controller untuk JavaFX
-│       │   ├── cores/                     # Logika crawling
-│       │   │   ├── Crawler.java
-│       │   │   └── Frontier.java
-│       │   ├── models/                    # Model data untuk tabel UI
-│       │   │   ├── WebpageLink.java
-│       │   │   ├── BrokenLink.java
-│       │   │   └── Link.java
-│       │   └── utils/                     # Utility tambahan
-│       │       └── HttpStatus.java
-│       └── resources/com/unpar/brokenlinkchecker/
-│           ├── view.fxml                   # Desain antarmuka aplikasi
-│           └── style.css                   # Styling tampilan
-```
 
 ## Cara Menjalankan
 
