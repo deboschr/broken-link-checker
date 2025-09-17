@@ -23,8 +23,8 @@ Hasil crawling ditampilkan dalam dua tabel:
 
 ## Teknologi
 - **Java 23**
-- **JavaFX 23** (`controls`, `fxml`)
-- **Gradle 8**
+- **JavaFX 17.0.6**
+- **Gradle 8.10**
 - **Jsoup 1.21.2**
 - **Java HttpClient (java.net.http)**
 
