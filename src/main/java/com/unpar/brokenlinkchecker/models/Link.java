@@ -15,13 +15,27 @@ public class Link {
     }
 
     // Properties
-    public StringProperty urlProperty() { return url; }
-    public IntegerProperty statusCodeProperty() { return statusCode; }
+    public StringProperty urlProperty() {
+        return url;
+    }
+
+    public IntegerProperty statusCodeProperty() {
+        return statusCode;
+    }
 
     // Getters & Setters
-    public String getUrl() { return url.get(); }
-    public void setUrl(String value) { url.set(value); }
+    public String getUrl() {
+        return url.get();
+    }
 
-    public int getStatusCode() { return statusCode.get(); }
-    public void setStatusCode(int value) { statusCode.set(value); }
+    public void setUrl(String value) {
+        url.set(value);
+    }
+
+    public int getStatusCode() {
+        return statusCode.get();
+    }
+    public void setStatusCode(int value) {
+        statusCode.set(value);
+    }
 }

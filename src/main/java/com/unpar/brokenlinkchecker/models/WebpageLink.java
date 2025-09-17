@@ -17,13 +17,28 @@ public class WebpageLink extends Link {
     }
 
     // Property
-    public IntegerProperty linkCountProperty() { return linkCount; }
-    public ObjectProperty<Instant> accessTimeProperty() { return accessTime; }
+    public IntegerProperty linkCountProperty() {
+        return linkCount;
+    }
+
+    public ObjectProperty<Instant> accessTimeProperty() {
+        return accessTime;
+    }
 
     // Getter & Setter
-    public int getLinkCount() { return linkCount.get(); }
-    public void setLinkCount(int value) { linkCount.set(value); }
+    public int getLinkCount() {
+        return linkCount.get();
+    }
 
-    public Instant getAccessTime() { return accessTime.get(); }
-    public void setAccessTime(Instant value) { accessTime.set(value); }
+    public void setLinkCount(int value) {
+        linkCount.set(value);
+    }
+
+    public Instant getAccessTime() {
+        return accessTime.get();
+    }
+
+    public void setAccessTime(Instant value) {
+        accessTime.set(value);
+    }
 }
