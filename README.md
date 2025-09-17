@@ -55,9 +55,6 @@ broken-link-checker/
 
 ## Cara Menjalankan
 
-### Persyaratan
-- Sudah terpasang **JDK 23** atau versi lebih baru.
-
 ### Clone repository
 ```bash
 git clone https://github.com/deboschr/broken-link-checker.git
