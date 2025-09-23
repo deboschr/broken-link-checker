@@ -14,8 +14,8 @@ public class BrokenLink extends Link {
     }
 
     // Properties
-    public StringProperty anchorTextProperty() { return anchorText; }
-    public StringProperty webpageUrlProperty() { return webpageUrl; }
+//    public StringProperty anchorTextProperty() { return anchorText; }
+//    public StringProperty webpageUrlProperty() { return webpageUrl; }
 
     // Getters & Setters
     public String getAnchorText() { return anchorText.get(); }

@@ -5,7 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class App extends javafx.application.Application {
+public class Application extends javafx.application.Application {
 
     /**
      * Method main() jadi titik masuk program.
@@ -16,7 +16,7 @@ public class App extends javafx.application.Application {
 
     /**
      * Method start() otomatis dijalankan setelah method launch() dijalankan.
-     * Tugasnya: menyiapkann UI utama aplikasi.
+     * Tugasnya: menyiapkan UI utama aplikasi.
      */
     @Override
     public void start(Stage stage) throws Exception {

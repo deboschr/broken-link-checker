@@ -16,6 +16,7 @@ public class Frontier {
     // Deque dipakai sebagai queue sederhana untuk simpan URL
     private final Deque<String> urls = new ArrayDeque<>();
 
+
     /**
      * Tambahin URL baru ke frontier.
      * URL akan ditaruh di belakang antrian (addLast).

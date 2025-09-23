@@ -147,7 +147,7 @@ public class Crawler {
 
         for (Element a : doc.select("a[href]")) {
             String absoluteUrl = a.attr("abs:href");              // ambil absolute URL
-            String cleanedUrl = URLCanonicalization(absoluteUrl); // normalisasi
+            String cleanedUrl = canonical(absoluteUrl); // normalisasi
 
             if (cleanedUrl == null) continue;
 
@@ -192,7 +192,7 @@ public class Crawler {
      * - hapus port default (80, 443)
      * - hapus fragment (#...) karena gak dikirim ke server
      */
-    public static String URLCanonicalization(String rawUrl) {
+    private static String canonical(String rawUrl) {
         if (rawUrl == null || rawUrl.trim().isEmpty()) return null;
 
         URI url;

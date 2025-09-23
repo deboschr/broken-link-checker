@@ -17,13 +17,13 @@ public class WebpageLink extends Link {
     }
 
     // Property
-    public IntegerProperty linkCountProperty() {
-        return linkCount;
-    }
-
-    public ObjectProperty<Instant> accessTimeProperty() {
-        return accessTime;
-    }
+//    public IntegerProperty linkCountProperty() {
+//        return linkCount;
+//    }
+//
+//    public ObjectProperty<Instant> accessTimeProperty() {
+//        return accessTime;
+//    }
 
     // Getter & Setter
     public int getLinkCount() {
