@@ -14,7 +14,7 @@ public class Link {
         this.statusCode = new SimpleIntegerProperty(statusCode);
     }
 
-    // Properties
+    //========================================================
     public StringProperty urlProperty() {
         return url;
     }
@@ -23,7 +23,7 @@ public class Link {
         return statusCode;
     }
 
-    // Getters & Setters
+    //========================================================
     public String getUrl() {
         return url.get();
     }
@@ -32,9 +32,11 @@ public class Link {
         url.set(value);
     }
 
+    //========================================================
     public int getStatusCode() {
         return statusCode.get();
     }
+
     public void setStatusCode(int value) {
         statusCode.set(value);
     }

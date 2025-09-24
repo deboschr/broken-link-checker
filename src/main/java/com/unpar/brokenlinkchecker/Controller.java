@@ -96,7 +96,7 @@ public class Controller {
 
         // Jalankan crawling di thread terpisah
         new Thread(() -> {
-            crawler.crawl(
+            crawler.startCrawling(
                     // tiap kali nemu WebpageLink, masukin ke list halaman
                     wp -> Platform.runLater(() -> webpageData.add(wp)),
                     // tiap kali nemu BrokenLink, masukin ke list brokenlink

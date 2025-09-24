@@ -44,7 +44,7 @@ public class Crawler {
         this.repositories = new HashSet<>();
         this.frontier = new Frontier();
 
-        frontier.add(seedUrl);
+        frontier.enqueue(seedUrl);
     }
 
     /**
@@ -55,11 +55,11 @@ public class Crawler {
      * - Ekstrak semua link dari halaman, lalu tentukan apakah link itu halaman lagi (lanjut crawl) atau link resource (cukup dicek status).
      * - Setiap kali dapat hasil, dikirim lewat Consumer ke UI.
      */
-    public void crawl(Consumer<WebpageLink> streamWebpageLink,
-                      Consumer<BrokenLink> streamBrokenLink) {
+    public void startCrawling(Consumer<WebpageLink> streamWebpageLink,
+                              Consumer<BrokenLink> streamBrokenLink) {
 
         while (!frontier.isEmpty()) {
-            String webpageLink = frontier.next();
+            String webpageLink = frontier.dequeue();
 
             // skip kalau sudah pernah dicek
             if (!repositories.add(webpageLink)) {
@@ -113,7 +113,7 @@ public class Crawler {
                 // kalau link masih satu host (same domain) maka anggap ini berpotensi jadi halaman
                 if (isPotentialWebpage(bl.getUrl())) {
                     if (!repositories.contains(bl.getUrl())) {
-                        frontier.add(bl.getUrl());
+                        frontier.enqueue(bl.getUrl());
                     }
                 }
                 // kalau bukan halaman (misal gambar, css, js, dll.)
