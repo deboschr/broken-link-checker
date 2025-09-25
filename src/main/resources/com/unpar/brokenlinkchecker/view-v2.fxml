@@ -14,7 +14,7 @@
     <!-- Main Content -->
     <center>
         <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
-            <VBox spacing="24" alignment="TOP_CENTER">
+            <VBox styleClass="main-container" spacing="24" alignment="TOP_CENTER">
                 <padding>
                     <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>

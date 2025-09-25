@@ -5,6 +5,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class Application extends javafx.application.Application {
 
     /**
@@ -29,7 +31,7 @@ public class Application extends javafx.application.Application {
 
         // ✅ Apply CSS (supaya dark mode aktif)
         scene.getStylesheets().add(
-                getClass().getResource("/com/unpar/brokenlinkchecker/style-v2.css").toExternalForm()
+                Objects.requireNonNull(getClass().getResource("/com/unpar/brokenlinkchecker/style-v2.css")).toExternalForm()
         );
 
         // Set konfigurasi stage (window utama)
