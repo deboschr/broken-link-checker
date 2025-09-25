@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.collections.FXCollections?>
+
+<BorderPane xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.unpar.brokenlinkchecker.Controller"
+            prefWidth="1280" prefHeight="800"
+            styleClass="root">
+
+    <!-- Main Content -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <VBox spacing="24" alignment="TOP_CENTER" padding="20">
+
+                <!-- Seed URL Card -->
+                <VBox styleClass="card" spacing="12" prefWidth="1000">
+                    <Label text="Seed URL" styleClass="filter-label"/>
+                    <HBox spacing="12">
+                        <TextField fx:id="seedUrlField" promptText="https://example.com"
+                                   styleClass="text-input" HBox.hgrow="ALWAYS"/>
+                        <Button text="Start Crawling" onAction="#onStartClick" styleClass="button-primary"/>
+                        <Button text="Stop Crawling" onAction="#onStopClick" styleClass="button-secondary"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Stats Cards -->
+                <HBox spacing="16">
+                    <VBox styleClass="card" alignment="CENTER" prefWidth="200" prefHeight="100">
+                        <Label text="Total Links Checked" style="-fx-font-size: 12px; -fx-text-fill: gray;"/>
+                        <Label fx:id="totalLinksLabel" text="12,345" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                    </VBox>
+                    <VBox styleClass="card" alignment="CENTER" prefWidth="200" prefHeight="100">
+                        <Label text="Broken Links" style="-fx-font-size: 12px; -fx-text-fill: gray;"/>
+                        <Label fx:id="brokenLinksLabel" text="234" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: red;"/>
+                    </VBox>
+                    <VBox styleClass="card" alignment="CENTER" prefWidth="200" prefHeight="100">
+                        <Label text="Webpages" style="-fx-font-size: 12px; -fx-text-fill: gray;"/>
+                        <Label fx:id="webpagesLabel" text="1,234" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Filters Section -->
+                <VBox spacing="16" prefWidth="1000">
+                    <Label text="Filters" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <GridPane hgap="16" vgap="16">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                            <ColumnConstraints hgrow="ALWAYS"/>
+                        </columnConstraints>
+
+                        <!-- URL Filter -->
+                        <VBox styleClass="card" spacing="8" GridPane.columnIndex="0">
+                            <Label text="URL" styleClass="filter-label"/>
+                            <HBox spacing="8">
+                                <ComboBox styleClass="combo-box">
+                                    <items>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <String fx:value="contains"/>
+                                            <String fx:value="equals"/>
+                                            <String fx:value="starts with"/>
+                                            <String fx:value="ends with"/>
+                                        </FXCollections>
+                                    </items>
+                                </ComboBox>
+                                <TextField promptText="Enter URL..." styleClass="text-input" HBox.hgrow="ALWAYS"/>
+                            </HBox>
+                        </VBox>
+
+                        <!-- Status Code Filter -->
+                        <VBox styleClass="card" spacing="8" GridPane.columnIndex="1">
+                            <Label text="Status Code" styleClass="filter-label"/>
+                            <HBox spacing="8">
+                                <ComboBox styleClass="combo-box">
+                                    <items>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <String fx:value="equals"/>
+                                            <String fx:value="greater than"/>
+                                            <String fx:value="less than"/>
+                                        </FXCollections>
+                                    </items>
+                                </ComboBox>
+                                <TextField promptText="200 / 404 / 500..." styleClass="text-input" HBox.hgrow="ALWAYS"/>
+                            </HBox>
+                        </VBox>
+
+                        <!-- Direction Filter -->
+                        <VBox styleClass="card" spacing="8" GridPane.columnIndex="2">
+                            <Label text="Direction" styleClass="filter-label"/>
+                            <ComboBox styleClass="combo-box">
+                                <items>
+                                    <FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="Inbound"/>
+                                        <String fx:value="Outbound"/>
+                                    </FXCollections>
+                                </items>
+                            </ComboBox>
+                        </VBox>
+                    </GridPane>
+                </VBox>
+
+                <!-- Results Section -->
+                <VBox spacing="12" prefWidth="1000">
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label text="Results" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <Button text="Export" onAction="#onExportClick" styleClass="button-secondary"/>
+                    </HBox>
+
+                    <!-- Table -->
+                    <TableView fx:id="resultsTable" prefHeight="400">
+                        <columns>
+                            <TableColumn text="Status" prefWidth="200"/>
+                            <TableColumn text="URL" prefWidth="800"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

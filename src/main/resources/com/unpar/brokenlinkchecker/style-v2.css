@@ -1,0 +1,181 @@
+/* ===== Root Styles ===== */
+.root {
+    -fx-font-family: "Inter";
+    -fx-background-color: #f5f6f8; /* light mode background */
+}
+
+.root.dark {
+    -fx-background-color: #0f1323; /* dark mode background */
+}
+
+/* ===== Card Wrapper ===== */
+.card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12px;
+    -fx-border-color: #d1d5db; /* gray-300 */
+    -fx-border-radius: 12px;
+    -fx-padding: 16px;
+    -fx-spacing: 8px;
+}
+
+.root.dark .card {
+    -fx-background-color: #1f2937; /* gray-800 */
+    -fx-border-color: #4b5563;     /* gray-600 */
+}
+
+/* ===== Labels ===== */
+.filter-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #374151; /* gray-700 */
+}
+
+.root.dark .filter-label {
+    -fx-text-fill: #d1d5db; /* gray-300 */
+}
+
+/* ===== Text Input & ComboBox ===== */
+.text-input,
+.combo-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d1d5db;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 0 8px;
+    -fx-pref-height: 40px;
+    -fx-font-size: 13px;
+    -fx-text-fill: #111827; /* gray-900 */
+}
+
+.root.dark .text-input,
+.root.dark .combo-box {
+    -fx-background-color: #1f2937;
+    -fx-text-fill: #f9fafb; /* white */
+    -fx-border-color: #4b5563;
+}
+
+.text-input:focused,
+.combo-box:focused {
+    -fx-border-color: #607AFB;
+    -fx-effect: dropshadow(three-pass-box, rgba(96,122,251,0.25), 4, 0, 0, 0);
+}
+
+/* ===== Buttons ===== */
+.button {
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 16px;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+}
+
+/* Primary button (blue) */
+.button-primary {
+    -fx-background-color: #607AFB;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+}
+
+.button-primary:hover {
+    -fx-background-color: #4f65d4;
+}
+
+.root.dark .button-primary {
+    -fx-background-color: #607AFB;
+    -fx-text-fill: white;
+}
+
+/* Secondary button (gray border) */
+.button-secondary {
+    -fx-background-color: transparent;
+    -fx-border-color: #d1d5db;
+    -fx-text-fill: #374151;
+}
+
+.button-secondary:hover {
+    -fx-background-color: #f3f4f6;
+}
+
+.root.dark .button-secondary {
+    -fx-border-color: #4b5563;
+    -fx-text-fill: #d1d5db;
+}
+
+.root.dark .button-secondary:hover {
+    -fx-background-color: #374151;
+}
+
+/* ===== TableView ===== */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #d1d5db;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.root.dark .table-view {
+    -fx-border-color: #4b5563;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f9fafb; /* gray-50 */
+    -fx-border-color: #d1d5db;
+}
+
+.root.dark .table-view .column-header-background {
+    -fx-background-color: #1f2937;
+    -fx-border-color: #4b5563;
+}
+
+.table-view .column-header,
+.table-view .column-header .label {
+    -fx-text-fill: #374151;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.root.dark .table-view .column-header .label {
+    -fx-text-fill: #d1d5db;
+}
+
+.table-view .cell {
+    -fx-border-color: transparent transparent #e5e7eb transparent; /* gray-200 bottom border */
+    -fx-padding: 8px;
+    -fx-font-size: 13px;
+    -fx-text-fill: #111827;
+}
+
+.root.dark .table-view .cell {
+    -fx-border-color: transparent transparent #374151 transparent;
+    -fx-text-fill: #f9fafb;
+}
+
+/* Alternating row colors */
+.table-view .cell:odd {
+    -fx-background-color: #ffffff;
+}
+
+.table-view .cell:even {
+    -fx-background-color: #f9fafb;
+}
+
+.root.dark .table-view .cell:odd {
+    -fx-background-color: #1f2937;
+}
+
+.root.dark .table-view .cell:even {
+    -fx-background-color: #111827;
+}
+
+/* Status text colors */
+.status-ok {
+    -fx-text-fill: #16a34a; /* green-600 */
+    -fx-font-weight: bold;
+}
+
+.status-error {
+    -fx-text-fill: #dc2626; /* red-600 */
+    -fx-font-weight: bold;
+}
