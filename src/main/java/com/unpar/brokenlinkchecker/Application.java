@@ -27,8 +27,10 @@ public class Application extends javafx.application.Application {
         // Bungkus root node ke dalam Scene
         Scene scene = new Scene(root);
 
-        // apply CSS
-        getClass().getResource("/com/unpar/brokenlinkchecker/style-v2.css");
+        // ✅ Apply CSS (supaya dark mode aktif)
+        scene.getStylesheets().add(
+                getClass().getResource("/com/unpar/brokenlinkchecker/style-v2.css").toExternalForm()
+        );
 
         // Set konfigurasi stage (window utama)
         stage.setTitle("BrokenLink Checker"); // judul window

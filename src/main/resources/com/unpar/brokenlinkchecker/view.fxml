@@ -5,7 +5,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.unpar.brokenlinkchecker.ControllerV2">
+            fx:controller="com.unpar.brokenlinkchecker.Controller">
 
     <!-- Bagian atas: input + tombol -->
     <top>

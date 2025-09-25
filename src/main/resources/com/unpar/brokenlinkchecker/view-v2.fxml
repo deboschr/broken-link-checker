@@ -4,16 +4,20 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
 
 <BorderPane xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.unpar.brokenlinkchecker.Controller"
+            fx:controller="com.unpar.brokenlinkchecker.ControllerV2"
             prefWidth="1280" prefHeight="800"
             styleClass="root">
 
     <!-- Main Content -->
     <center>
         <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
-            <VBox spacing="24" alignment="TOP_CENTER" padding="20">
+            <VBox spacing="24" alignment="TOP_CENTER">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
 
                 <!-- Seed URL Card -->
                 <VBox styleClass="card" spacing="12" prefWidth="1000">
@@ -29,22 +33,22 @@
                 <!-- Stats Cards -->
                 <HBox spacing="16">
                     <VBox styleClass="card" alignment="CENTER" prefWidth="200" prefHeight="100">
-                        <Label text="Total Links Checked" style="-fx-font-size: 12px; -fx-text-fill: gray;"/>
-                        <Label fx:id="totalLinksLabel" text="12,345" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                        <Label text="Total Links Checked" styleClass="stat-subtitle"/>
+                        <Label fx:id="totalLinksLabel" text="0" styleClass="stat-value"/>
                     </VBox>
                     <VBox styleClass="card" alignment="CENTER" prefWidth="200" prefHeight="100">
-                        <Label text="Broken Links" style="-fx-font-size: 12px; -fx-text-fill: gray;"/>
-                        <Label fx:id="brokenLinksLabel" text="234" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: red;"/>
+                        <Label text="Broken Links" styleClass="stat-subtitle"/>
+                        <Label fx:id="brokenLinksLabel" text="0" styleClass="stat-value red"/>
                     </VBox>
                     <VBox styleClass="card" alignment="CENTER" prefWidth="200" prefHeight="100">
-                        <Label text="Webpages" style="-fx-font-size: 12px; -fx-text-fill: gray;"/>
-                        <Label fx:id="webpagesLabel" text="1,234" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+                        <Label text="Webpages" styleClass="stat-subtitle"/>
+                        <Label fx:id="webpagesLabel" text="0" styleClass="stat-value"/>
                     </VBox>
                 </HBox>
 
                 <!-- Filters Section -->
                 <VBox spacing="16" prefWidth="1000">
-                    <Label text="Filters" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    <Label text="Filters" styleClass="stat-value"/>
                     <GridPane hgap="16" vgap="16">
                         <columnConstraints>
                             <ColumnConstraints hgrow="ALWAYS"/>
@@ -105,15 +109,15 @@
                 <!-- Results Section -->
                 <VBox spacing="12" prefWidth="1000">
                     <HBox alignment="CENTER_LEFT" spacing="12">
-                        <Label text="Results" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        <Label text="Results" styleClass="stat-value"/>
                         <Button text="Export" onAction="#onExportClick" styleClass="button-secondary"/>
                     </HBox>
 
-                    <!-- Table -->
+                    <!-- Results Table -->
                     <TableView fx:id="resultsTable" prefHeight="400">
                         <columns>
-                            <TableColumn text="Status" prefWidth="200"/>
-                            <TableColumn text="URL" prefWidth="800"/>
+                            <TableColumn fx:id="statusColumn" text="Status" prefWidth="200"/>
+                            <TableColumn fx:id="urlColumn" text="URL" prefWidth="800"/>
                         </columns>
                     </TableView>
                 </VBox>
