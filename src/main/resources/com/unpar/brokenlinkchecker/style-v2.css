@@ -100,41 +100,46 @@
 	-fx-background-radius: 8px;
 }
 
-/* Header background */
+/* Header menyatu dengan body */
 .table-view .column-header-background {
-	-fx-background-color: #111827;
-	-fx-border-color: #374151;
+	-fx-background-color: #1f2937; /* sama dengan body */
+	-fx-background-radius: 8px 8px 0 0; /* rounded atas */
+	-fx-border-color: #4b5563; /* hanya 1 border */
+	-fx-border-width: 0 0 1px 0; /* hanya garis bawah */
+	-fx-padding: 0;
 }
 
-/* Header text */
+/* Header text rata kiri */
 .table-view .column-header,
 .table-view .column-header .label {
-	-fx-background-color: #111827;
-	-fx-text-fill: #d1d5db;
+	-fx-background-color: transparent; /* supaya menyatu */
+	-fx-text-fill: #f9fafb;
 	-fx-font-size: 12px;
 	-fx-font-weight: bold;
+	-fx-alignment: CENTER_LEFT;
+	-fx-padding: 8px;
 }
 
 /* Header filler (bagian kosong) */
 .table-view .filler {
-	-fx-background-color: #111827;
+	-fx-background-color: #1f2937;
+	-fx-background-radius: 8px 8px 0 0;
 }
 
-/* Cell styles */
+/* Isi tabel transparan atau sama primary */
 .table-view .cell {
-    -fx-background-color: #1f2937;
-    -fx-border-color: transparent transparent #374151 transparent;
+    -fx-background-color: transparent; /* body transparan */
+    -fx-border-color: transparent transparent #374151 transparent; /* hanya garis bawah */
     -fx-padding: 8px;
     -fx-font-size: 13px;
     -fx-text-fill: #f9fafb;
+    -fx-alignment: CENTER_LEFT;
 }
 
-/* Alternating row colors */
-.table-view .cell:odd {
-	-fx-background-color: #1f2937;
-}
+/* Hapus alternating row */
+.table-view .cell:odd,
 .table-view .cell:even {
-	-fx-background-color: #111827;
+	-fx-background-color: transparent;
 }
 
 /* TableView placeholder (area kosong) */
@@ -191,15 +196,17 @@
 	-fx-background-color: #1f2937;
 }
 .combo-box .list-cell:selected {
-	-fx-background-color: #1f2937; /* tidak abu lagi */
+	-fx-background-color: #1f2937;
 	-fx-text-fill: #f9fafb;
 }
 
 /* URL */
 .hyperlink {
-    -fx-text-fill: #3b82f6;   /* biru link */
+	-fx-text-fill: #3b82f6; /* biru link */
 }
-
 .hyperlink:visited {
-    -fx-text-fill: #3b82f6;   /* tetap biru, tidak berubah setelah diklik */
+	-fx-text-fill: #3b82f6; /* tetap biru, tidak berubah setelah diklik */
+}
+.hyperlink:hover {
+	-fx-text-fill: #60a5fa; /* biru lebih terang saat hover */
 }
