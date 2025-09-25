@@ -103,17 +103,16 @@
 /* Header background */
 .table-view .column-header-background {
 	-fx-background-color: #111827;
-	-fx-border-color: transparent transparent #374151 transparent; /* hanya garis bawah */
+	-fx-border-color: #374151;
 }
 
-/* Header text rata kiri */
+/* Header text */
 .table-view .column-header,
 .table-view .column-header .label {
 	-fx-background-color: #111827;
 	-fx-text-fill: #d1d5db;
 	-fx-font-size: 12px;
 	-fx-font-weight: bold;
-	-fx-alignment: CENTER_LEFT; /* rata kiri */
 }
 
 /* Header filler (bagian kosong) */
@@ -121,17 +120,19 @@
 	-fx-background-color: #111827;
 }
 
-/* Semua cell sama warnanya */
+/* Cell styles */
 .table-view .cell {
-	-fx-background-color: #1f2937;
-	-fx-border-color: transparent transparent #374151 transparent;
-	-fx-padding: 8px;
-	-fx-font-size: 13px;
-	-fx-text-fill: #f9fafb;
+    -fx-background-color: #1f2937;
+    -fx-border-color: transparent transparent #374151 transparent;
+    -fx-padding: 8px;
+    -fx-font-size: 13px;
+    -fx-text-fill: #f9fafb;
 }
 
-/* Hapus alternating row */
-.table-view .cell:odd,
+/* Alternating row colors */
+.table-view .cell:odd {
+	-fx-background-color: #1f2937;
+}
 .table-view .cell:even {
 	-fx-background-color: #111827;
 }
@@ -196,11 +197,9 @@
 
 /* URL */
 .hyperlink {
-	-fx-text-fill: #3b82f6; /* biru link */
+    -fx-text-fill: #3b82f6;   /* biru link */
 }
+
 .hyperlink:visited {
-	-fx-text-fill: #3b82f6; /* tetap biru, tidak berubah setelah diklik */
-}
-.hyperlink:hover {
-	-fx-text-fill: #60a5fa; /* biru lebih terang saat hover */
+    -fx-text-fill: #3b82f6;   /* tetap biru, tidak berubah setelah diklik */
 }
