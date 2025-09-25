@@ -128,12 +128,12 @@
 
 /* Isi tabel transparan atau sama primary */
 .table-view .cell {
-    -fx-background-color: transparent; /* body transparan */
-    -fx-border-color: transparent transparent #374151 transparent; /* hanya garis bawah */
-    -fx-padding: 8px;
-    -fx-font-size: 13px;
-    -fx-text-fill: #f9fafb;
-    -fx-alignment: CENTER_LEFT;
+	-fx-background-color: transparent; /* body transparan */
+	-fx-border-color: transparent transparent #374151 transparent; /* hanya garis bawah */
+	-fx-padding: 8px;
+	-fx-font-size: 13px;
+	-fx-text-fill: #f9fafb;
+	-fx-alignment: CENTER_LEFT;
 }
 
 /* Hapus alternating row */
