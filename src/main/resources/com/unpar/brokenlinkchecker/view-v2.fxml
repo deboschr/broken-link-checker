@@ -114,12 +114,15 @@
                     </HBox>
 
                     <!-- Results Table -->
-                    <TableView fx:id="resultsTable" prefHeight="400">
+                    <TableView fx:id="resultsTable"
+                               prefHeight="400">
                         <columns>
-                            <TableColumn fx:id="statusColumn" text="Status" prefWidth="200"/>
-                            <TableColumn fx:id="urlColumn" text="URL" prefWidth="800"/>
+                            <TableColumn fx:id="statusColumn" text="Status" prefWidth="200" resizable="false"/>
+                            <TableColumn fx:id="urlColumn" text="URL" prefWidth="800" resizable="false"/>
                         </columns>
                     </TableView>
+
+
                 </VBox>
 
             </VBox>

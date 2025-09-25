@@ -122,10 +122,11 @@
 
 /* Cell styles */
 .table-view .cell {
-	-fx-border-color: transparent transparent #374151 transparent;
-	-fx-padding: 8px;
-	-fx-font-size: 13px;
-	-fx-text-fill: #f9fafb;
+    -fx-background-color: #1f2937;
+    -fx-border-color: transparent transparent #374151 transparent;
+    -fx-padding: 8px;
+    -fx-font-size: 13px;
+    -fx-text-fill: #f9fafb;
 }
 
 /* Alternating row colors */
@@ -192,4 +193,13 @@
 .combo-box .list-cell:selected {
 	-fx-background-color: #1f2937; /* tidak abu lagi */
 	-fx-text-fill: #f9fafb;
+}
+
+/* URL */
+.hyperlink {
+    -fx-text-fill: #3b82f6;   /* biru link */
+}
+
+.hyperlink:visited {
+    -fx-text-fill: #3b82f6;   /* tetap biru, tidak berubah setelah diklik */
 }

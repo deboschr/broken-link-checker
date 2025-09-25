@@ -5,7 +5,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.awt.Desktop;
+import java.net.URI;
+
+/**
+ * Controller untuk view-v2.fxml
+ */
 public class ControllerV2 {
 
     // Input seed URL
@@ -34,20 +41,54 @@ public class ControllerV2 {
 
     @FXML
     public void initialize() {
-        // Setup TableView bindings
+        // Binding lebar kolom ke persentase
+        statusColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.3)); // 30%
+        urlColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.7));    // 70%
+
+        // Set data ke kolom
         statusColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
         urlColumn.setCellValueFactory(cellData -> cellData.getValue().urlProperty());
 
         resultsTable.setItems(results);
 
-        // Dummy data (sementara, untuk test UI)
+        // URL clickable hyperlink
+        urlColumn.setCellFactory(col -> new TableCell<>() {
+            private final Hyperlink link = new Hyperlink();
+
+            {
+                link.setOnAction(e -> {
+                    String url = link.getText();
+                    try {
+                        if (Desktop.isDesktopSupported()) {
+                            Desktop.getDesktop().browse(new URI(url));
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    link.setText(item);
+                    setGraphic(link);
+                }
+            }
+        });
+
+        // Dummy data
         results.add(new LinkResult("200 OK", "https://example.com/page1"));
         results.add(new LinkResult("404 Not Found", "https://example.com/broken"));
         results.add(new LinkResult("500 Internal Server Error", "https://example.com/error"));
 
-        // Update stats (dummy)
         updateStats();
     }
+
+
 
     @FXML
     private void onStartClick() {
@@ -81,8 +122,12 @@ public class ControllerV2 {
 
     private void updateStats() {
         int total = results.size();
-        long broken = results.stream().filter(r -> r.getStatus().startsWith("4") || r.getStatus().startsWith("5")).count();
-        long webpages = results.stream().filter(r -> r.getUrl().contains("example.com")).count(); // dummy rule
+        long broken = results.stream()
+                .filter(r -> r.getStatus().startsWith("4") || r.getStatus().startsWith("5"))
+                .count();
+        long webpages = results.stream()
+                .filter(r -> r.getUrl().contains("example.com")) // dummy rule
+                .count();
 
         totalLinksLabel.setText(String.valueOf(total));
         brokenLinksLabel.setText(String.valueOf(broken));
