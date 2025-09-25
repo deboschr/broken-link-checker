@@ -184,12 +184,12 @@
 	-fx-background-color: #374151;
 }
 
-/* ComboBox selected item */
+/* ComboBox selected item → sama dengan default */
 .combo-box .list-cell {
 	-fx-text-fill: #f9fafb;
 	-fx-background-color: #1f2937;
 }
 .combo-box .list-cell:selected {
-	-fx-background-color: #374151;
+	-fx-background-color: #1f2937; /* tidak abu lagi */
 	-fx-text-fill: #f9fafb;
 }
