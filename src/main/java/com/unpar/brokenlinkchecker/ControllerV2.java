@@ -42,8 +42,8 @@ public class ControllerV2 {
     @FXML
     public void initialize() {
         // Binding lebar kolom ke persentase
-        statusColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.3)); // 30%
-        urlColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.7));    // 70%
+        statusColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.2)); // 30%
+        urlColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.8));    // 70%
 
         // Set data ke kolom
         statusColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());

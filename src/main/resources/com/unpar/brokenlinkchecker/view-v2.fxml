@@ -38,7 +38,7 @@
                     </VBox>
                     <VBox styleClass="card" alignment="CENTER" prefWidth="200" prefHeight="100">
                         <Label text="Broken Links" styleClass="stat-subtitle"/>
-                        <Label fx:id="brokenLinksLabel" text="0" styleClass="stat-value red"/>
+                        <Label fx:id="brokenLinksLabel" text="0" styleClass="stat-value-red"/>
                     </VBox>
                     <VBox styleClass="card" alignment="CENTER" prefWidth="200" prefHeight="100">
                         <Label text="Webpages" styleClass="stat-subtitle"/>
@@ -90,19 +90,6 @@
                                 <TextField promptText="200 / 404 / 500..." styleClass="text-input" HBox.hgrow="ALWAYS"/>
                             </HBox>
                         </VBox>
-
-                        <!-- Direction Filter -->
-                        <VBox styleClass="card" spacing="8" GridPane.columnIndex="2">
-                            <Label text="Direction" styleClass="filter-label"/>
-                            <ComboBox styleClass="combo-box">
-                                <items>
-                                    <FXCollections fx:factory="observableArrayList">
-                                        <String fx:value="Inbound"/>
-                                        <String fx:value="Outbound"/>
-                                    </FXCollections>
-                                </items>
-                            </ComboBox>
-                        </VBox>
                     </GridPane>
                 </VBox>
 
@@ -114,17 +101,13 @@
                     </HBox>
 
                     <!-- Results Table -->
-                    <TableView fx:id="resultsTable"
-                               prefHeight="400">
+                    <TableView fx:id="resultsTable" prefHeight="400">
                         <columns>
-                            <TableColumn fx:id="statusColumn" text="Status" prefWidth="200" resizable="false"/>
-                            <TableColumn fx:id="urlColumn" text="URL" prefWidth="800" resizable="false"/>
+                            <TableColumn fx:id="statusColumn" text="Status" resizable="false"/>
+                            <TableColumn fx:id="urlColumn" text="URL" resizable="false"/>
                         </columns>
                     </TableView>
-
-
                 </VBox>
-
             </VBox>
         </ScrollPane>
     </center>

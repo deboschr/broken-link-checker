@@ -31,7 +31,9 @@
 	-fx-text-fill: #f9fafb; /* white */
 }
 
-.stat-value.red {
+.stat-value-red {
+	-fx-font-size: 24px;
+	-fx-font-weight: bold;
 	-fx-text-fill: #ef4444; /* red-500 */
 }
 
@@ -102,9 +104,9 @@
 
 /* Header menyatu dengan body */
 .table-view .column-header-background {
-	-fx-background-color: #1f2937; /* sama dengan body */
-	-fx-background-radius: 8px 8px 0 0; /* rounded atas */
-	-fx-border-color: #4b5563; /* hanya 1 border */
+	-fx-background-color: #1f2937;
+	-fx-background-radius: 8px 8px 0 0;
+	-fx-border-color: #4b5563;
 	-fx-border-width: 0 0 1px 0; /* hanya garis bawah */
 	-fx-padding: 0;
 }
@@ -112,7 +114,7 @@
 /* Header text rata kiri */
 .table-view .column-header,
 .table-view .column-header .label {
-	-fx-background-color: transparent; /* supaya menyatu */
+	-fx-background-color: transparent;
 	-fx-text-fill: #f9fafb;
 	-fx-font-size: 12px;
 	-fx-font-weight: bold;
@@ -126,10 +128,11 @@
 	-fx-background-radius: 8px 8px 0 0;
 }
 
-/* Isi tabel transparan atau sama primary */
+/* Isi tabel */
 .table-view .cell {
-	-fx-background-color: transparent; /* body transparan */
+	-fx-background-color: transparent;
 	-fx-border-color: transparent transparent #374151 transparent; /* hanya garis bawah */
+	-fx-border-width: 0 0 1px 0;
 	-fx-padding: 8px;
 	-fx-font-size: 13px;
 	-fx-text-fill: #f9fafb;
@@ -190,7 +193,7 @@
 	-fx-background-color: #374151;
 }
 
-/* ComboBox selected item → sama dengan default */
+/* ComboBox selected item */
 .combo-box .list-cell {
 	-fx-text-fill: #f9fafb;
 	-fx-background-color: #1f2937;
@@ -205,8 +208,8 @@
 	-fx-text-fill: #3b82f6; /* biru link */
 }
 .hyperlink:visited {
-	-fx-text-fill: #3b82f6; /* tetap biru, tidak berubah setelah diklik */
+	-fx-text-fill: #3b82f6;
 }
 .hyperlink:hover {
-	-fx-text-fill: #60a5fa; /* biru lebih terang saat hover */
+	-fx-text-fill: #60a5fa;
 }
