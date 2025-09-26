@@ -38,15 +38,15 @@
                         <Label text="Summary" styleClass="stat-value"/>
                         <HBox spacing="16">
                             <VBox alignment="CENTER" prefWidth="200" prefHeight="100" styleClass="card">
-                                <Label text="Total Links Checked" styleClass="stat-subtitle"/>
+                                <Label text="Progress" styleClass="stat-subtitle"/>
                                 <Region VBox.vgrow="ALWAYS"/>
-                                <Label fx:id="totalLinksLabel" text="0" styleClass="stat-value"/>
+                                <Label fx:id="progressLabel" text="50%" styleClass="stat-value"/>
                                 <Region VBox.vgrow="ALWAYS"/>
                             </VBox>
                             <VBox alignment="CENTER" prefWidth="200" prefHeight="100" styleClass="card">
-                                <Label text="Broken Links" styleClass="stat-subtitle"/>
+                                <Label text="Total Links Checked" styleClass="stat-subtitle"/>
                                 <Region VBox.vgrow="ALWAYS"/>
-                                <Label fx:id="brokenLinksLabel" text="0" styleClass="stat-value-red"/>
+                                <Label fx:id="totalLinksLabel" text="0" styleClass="stat-value"/>
                                 <Region VBox.vgrow="ALWAYS"/>
                             </VBox>
                             <VBox alignment="CENTER" prefWidth="200" prefHeight="100" styleClass="card">
@@ -56,16 +56,13 @@
                                 <Region VBox.vgrow="ALWAYS"/>
                             </VBox>
                             <VBox alignment="CENTER" prefWidth="200" prefHeight="100" styleClass="card">
-                                <Label text="Progress" styleClass="stat-subtitle"/>
+                                <Label text="Broken Links" styleClass="stat-subtitle"/>
                                 <Region VBox.vgrow="ALWAYS"/>
-                                <Label fx:id="progressLabel" text="50%" styleClass="stat-value"/>
+                                <Label fx:id="brokenLinksLabel" text="0" styleClass="stat-value-red"/>
                                 <Region VBox.vgrow="ALWAYS"/>
                             </VBox>
                         </HBox>
                     </VBox>
-
-                    <!-- Separator -->
-                    <Separator orientation="VERTICAL"/>
 
                     <!-- Filters -->
                     <VBox styleClass="card" spacing="16" HBox.hgrow="ALWAYS">
