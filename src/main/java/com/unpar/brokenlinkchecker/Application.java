@@ -23,7 +23,7 @@ public class Application extends javafx.application.Application {
     @Override
     public void start(Stage stage) throws Exception {
         // Loader buat baca file FXML (layout utama aplikasi)
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/unpar/brokenlinkchecker/view-v2.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/unpar/brokenlinkchecker/view.fxml"));
         Parent root = loader.load();
 
         // Bungkus root node ke dalam Scene
@@ -31,13 +31,13 @@ public class Application extends javafx.application.Application {
 
         // ✅ Apply CSS (supaya dark mode aktif)
         scene.getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource("/com/unpar/brokenlinkchecker/style-v2.css")).toExternalForm()
-        );
+                Objects.requireNonNull(getClass().getResource("/com/unpar/brokenlinkchecker/style.css"))
+                        .toExternalForm());
 
         // Set konfigurasi stage (window utama)
         stage.setTitle("BrokenLink Checker"); // judul window
-        stage.setScene(scene);                // kasih scene ke stage
-        stage.centerOnScreen();               // biar muncul di tengah layar
-        stage.show();                         // tampilkan window
+        stage.setScene(scene); // kasih scene ke stage
+        stage.centerOnScreen(); // biar muncul di tengah layar
+        stage.show(); // tampilkan window
     }
 }

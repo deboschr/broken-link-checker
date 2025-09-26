@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker.cores;
+package com.unpar.brokenlinkchecker;
 
 import java.util.ArrayDeque;
 import java.util.Queue;

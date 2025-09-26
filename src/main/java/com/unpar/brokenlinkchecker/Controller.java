@@ -1,107 +1,151 @@
 package com.unpar.brokenlinkchecker;
 
-import com.unpar.brokenlinkchecker.cores.Crawler;
-import com.unpar.brokenlinkchecker.models.WebpageLink;
-import com.unpar.brokenlinkchecker.models.BrokenLink;
-import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.awt.Desktop;
+import java.net.URI;
+import java.time.Instant;
+
+/**
+ * Controller untuk view-v2.fxml
+ */
 public class Controller {
 
-    @FXML private TextField urlField;
-    @FXML private Button checkButton;
+    // Input seed URL
+    @FXML
+    private TextField seedUrlField;
 
-    // Tabel untuk WebpageLink
-    @FXML private TableView<WebpageLink> webpageTable;
-    @FXML private TableColumn<WebpageLink, String> wpUrlColumn;
-    @FXML private TableColumn<WebpageLink, Number> wpStatusColumn;
-    @FXML private TableColumn<WebpageLink, Number> wpCountColumn;
-    @FXML private TableColumn<WebpageLink, String> wpAccessTimeColumn;
+    // Stats
+    @FXML
+    private Label totalLinksLabel;
+    @FXML
+    private Label brokenLinksLabel;
+    @FXML
+    private Label webpagesLabel;
+    @FXML
+    private Label progressLabel;
 
-    // Tabel untuk BrokenLink
-    @FXML private TableView<BrokenLink> brokenTable;
-    @FXML private TableColumn<BrokenLink, String> blUrlColumn;
-    @FXML private TableColumn<BrokenLink, Number> blStatusColumn;
-    @FXML private TableColumn<BrokenLink, String> blAnchorColumn;
-    @FXML private TableColumn<BrokenLink, String> blSourceColumn;
+    // Results table
+    @FXML
+    private TableView<BrokenLink> resultsTable;
 
-    // List data yang dipakai tabel halaman
-    private final ObservableList<WebpageLink> webpageData = FXCollections.observableArrayList();
-    // List data yang dipakai tabel broken link
-    private final ObservableList<BrokenLink> brokenData   = FXCollections.observableArrayList();
+    @FXML
+    private TableColumn<BrokenLink, String> statusColumn;
+    @FXML
+    private TableColumn<BrokenLink, String> urlColumn;
 
-    /**
-     * Method ini otomatis dijalankan setelah file FXML diload.
-     * Tugasnya: inisialisasi tabel supaya tiap kolom tahu harus ngambil data dari field mana.
-     * - Untuk tabel WebpageLink: ngikat URL, status code, jumlah link, dan waktu akses.
-     * - Untuk tabel BrokenLink: ngikat URL, status code, anchor text, dan halaman sumber.
-     * - Terakhir, pasang list data (webpageData, brokenData) ke tabel supaya isinya bisa ditampilkan secara stream dan otomatis berubah (auto update)
-     */
+    // Data storage
+    private final ObservableList<BrokenLink> results = FXCollections.observableArrayList();
+
     @FXML
     public void initialize() {
-        // === Tabel untuk WebpageLink ===
-        wpUrlColumn.setCellValueFactory(new PropertyValueFactory<>("url"));          // kolom URL
-        wpStatusColumn.setCellValueFactory(new PropertyValueFactory<>("statusCode"));// kolom status
-        wpCountColumn.setCellValueFactory(new PropertyValueFactory<>("linkCount"));  // kolom jumlah link
-        // kolom access time butuh convert dari Instant ke StringProperty biar bisa ditampilkan
-        wpAccessTimeColumn.setCellValueFactory(c ->
-                new SimpleStringProperty(c.getValue().getAccessTime().toString())
-        );
+        // Binding lebar kolom ke persentase
+        statusColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.2));
+        urlColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.8));
 
-        // === Tabel untuk BrokenLink ===
-        blUrlColumn.setCellValueFactory(new PropertyValueFactory<>("url"));          // kolom URL
-        blStatusColumn.setCellValueFactory(new PropertyValueFactory<>("statusCode"));// kolom status
-        blAnchorColumn.setCellValueFactory(new PropertyValueFactory<>("anchorText"));// kolom anchor
-        blSourceColumn.setCellValueFactory(new PropertyValueFactory<>("webpageUrl"));// kolom halaman sumber
+        // Kolom status → pakai HttpStatus
+        statusColumn.setCellValueFactory(cellData -> {
+            int code = cellData.getValue().getStatusCode();
+            String text = HttpStatus.getStatus(code);
+            return new ReadOnlyStringWrapper(text);
+        });
 
-        // Pasang list data ke tabel biar tabel bisa nampilin isinya dan auto update
-        webpageTable.setItems(webpageData);
-        brokenTable.setItems(brokenData);
+        // Kolom URL → langsung dari property
+        urlColumn.setCellValueFactory(cellData -> cellData.getValue().urlProperty());
+
+        resultsTable.setItems(results);
+
+        // URL clickable hyperlink
+        urlColumn.setCellFactory(col -> new TableCell<>() {
+            private final Hyperlink link = new Hyperlink();
+
+            {
+                link.setOnAction(e -> {
+                    String url = link.getText();
+                    try {
+                        if (Desktop.isDesktopSupported()) {
+                            Desktop.getDesktop().browse(new URI(url));
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    link.setText(item);
+                    setGraphic(link);
+                }
+            }
+        });
+
+        // Tambahkan data dummy
+        results.add(new BrokenLink("https://example.com/404", 404, Instant.now()));
+        results.add(new BrokenLink("https://example.com/500", 500, Instant.now()));
+        results.add(new BrokenLink("https://other.com/image.png", 0, Instant.now())); // 0 = connection error
+        results.add(new BrokenLink("https://example.com/home", 200, Instant.now()));
+
+        updateStats();
     }
 
-
-    /**
-     * Method ini dipanggil waktu user klik tombol "Check".
-     * Fungsinya: mulai proses crawling berdasarkan URL yang diinput user.
-     * - Ambil seed URL dari TextField.
-     * - Kalau kosong, munculin Alert warning.
-     * - Kalau ada, bersihin data lama dari tabel, lalu bikin objek Crawler baru.
-     * - Jalankan crawl di thread terpisah supaya UI nggak nge-freeze.
-     * - Hasil crawling (WebpageLink & BrokenLink) dikirim balik lewat Consumer,
-     *   terus dimasukin ke ObservableList pakai Platform.runLater() biar aman update UI.
-     */
     @FXML
-    protected void onCheckClick() {
-        // Ambil URL input dari TextField
-        String seedUrl = urlField.getText().trim();
-
-        // Validasi: kalau kosong, kasih alert dan stop
-        if (seedUrl.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Masukkan Seed URL terlebih dahulu!");
-            alert.showAndWait();
+    private void onStartClick() {
+        String seedUrl = seedUrlField.getText();
+        if (seedUrl == null || seedUrl.isBlank()) {
+            showAlert("Please enter a Seed URL first.");
             return;
         }
 
-        // Reset data tabel biar hasil baru nggak campur sama yang lama
-        webpageData.clear();
-        brokenData.clear();
+        System.out.println("Start crawling: " + seedUrl);
 
-        // Bikin objek crawler dengan seed URL
-        Crawler crawler = new Crawler(seedUrl);
+        // Reset data dummy
+        results.clear();
+        results.add(new BrokenLink(seedUrl + "/404", 404, Instant.now()));
+        results.add(new BrokenLink(seedUrl + "/contact", 200, Instant.now()));
 
-        // Jalankan crawling di thread terpisah
-        new Thread(() -> {
-            crawler.startCrawling(
-                    // tiap kali nemu WebpageLink, masukin ke list halaman
-                    wp -> Platform.runLater(() -> webpageData.add(wp)),
-                    // tiap kali nemu BrokenLink, masukin ke list brokenlink
-                    bl -> Platform.runLater(() -> brokenData.add(bl))
-            );
-        }).start();
+        updateStats();
+    }
+
+    @FXML
+    private void onStopClick() {
+        showAlert("Stop crawling not implemented yet.");
+    }
+
+    @FXML
+    private void onExportClick() {
+        showAlert("Export not implemented yet.");
+    }
+
+    private void updateStats() {
+        int total = results.size();
+        long broken = results.stream()
+                .filter(r -> r.getStatusCode() >= 400)
+                .count();
+        long webpages = results.stream()
+                .filter(r -> r.getUrl().contains("example.com")) // dummy rule
+                .count();
+
+        totalLinksLabel.setText(String.valueOf(total));
+        brokenLinksLabel.setText(String.valueOf(broken));
+        webpagesLabel.setText(String.valueOf(webpages));
+
+        // progress dummy
+        progressLabel.setText(total == 0 ? "0%" : "100%");
+    }
+
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
