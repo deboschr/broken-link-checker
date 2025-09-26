@@ -30,34 +30,49 @@
                     </HBox>
                 </VBox>
 
-                <!-- Stats Cards -->
-                <HBox spacing="16">
-                    <VBox styleClass="card" alignment="CENTER" prefWidth="200" prefHeight="100">
-                        <Label text="Total Links Checked" styleClass="stat-subtitle"/>
-                        <Label fx:id="totalLinksLabel" text="0" styleClass="stat-value"/>
-                    </VBox>
-                    <VBox styleClass="card" alignment="CENTER" prefWidth="200" prefHeight="100">
-                        <Label text="Broken Links" styleClass="stat-subtitle"/>
-                        <Label fx:id="brokenLinksLabel" text="0" styleClass="stat-value-red"/>
-                    </VBox>
-                    <VBox styleClass="card" alignment="CENTER" prefWidth="200" prefHeight="100">
-                        <Label text="Webpages" styleClass="stat-subtitle"/>
-                        <Label fx:id="webpagesLabel" text="0" styleClass="stat-value"/>
-                    </VBox>
-                </HBox>
+                <!-- Summary + Filters Section -->
+                <HBox spacing="24" prefWidth="1000" alignment="TOP_CENTER">
 
-                <!-- Filters Section -->
-                <VBox spacing="16" prefWidth="1000">
-                    <Label text="Filters" styleClass="stat-value"/>
-                    <GridPane hgap="16" vgap="16">
-                        <columnConstraints>
-                            <ColumnConstraints hgrow="ALWAYS"/>
-                            <ColumnConstraints hgrow="ALWAYS"/>
-                            <ColumnConstraints hgrow="ALWAYS"/>
-                        </columnConstraints>
+                    <!-- Summary -->
+                    <VBox styleClass="card" spacing="16">
+                        <Label text="Summary" styleClass="stat-value"/>
+                        <HBox spacing="16">
+                            <VBox alignment="CENTER" prefWidth="200" prefHeight="100" styleClass="card">
+                                <Label text="Total Links Checked" styleClass="stat-subtitle"/>
+                                <Region VBox.vgrow="ALWAYS"/>
+                                <Label fx:id="totalLinksLabel" text="0" styleClass="stat-value"/>
+                                <Region VBox.vgrow="ALWAYS"/>
+                            </VBox>
+                            <VBox alignment="CENTER" prefWidth="200" prefHeight="100" styleClass="card">
+                                <Label text="Broken Links" styleClass="stat-subtitle"/>
+                                <Region VBox.vgrow="ALWAYS"/>
+                                <Label fx:id="brokenLinksLabel" text="0" styleClass="stat-value-red"/>
+                                <Region VBox.vgrow="ALWAYS"/>
+                            </VBox>
+                            <VBox alignment="CENTER" prefWidth="200" prefHeight="100" styleClass="card">
+                                <Label text="Webpages" styleClass="stat-subtitle"/>
+                                <Region VBox.vgrow="ALWAYS"/>
+                                <Label fx:id="webpagesLabel" text="0" styleClass="stat-value"/>
+                                <Region VBox.vgrow="ALWAYS"/>
+                            </VBox>
+                            <VBox alignment="CENTER" prefWidth="200" prefHeight="100" styleClass="card">
+                                <Label text="Progress" styleClass="stat-subtitle"/>
+                                <Region VBox.vgrow="ALWAYS"/>
+                                <Label fx:id="progressLabel" text="50%" styleClass="stat-value"/>
+                                <Region VBox.vgrow="ALWAYS"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Separator -->
+                    <Separator orientation="VERTICAL"/>
+
+                    <!-- Filters -->
+                    <VBox styleClass="card" spacing="16" HBox.hgrow="ALWAYS">
+                        <Label text="Filters" styleClass="stat-value"/>
 
                         <!-- URL Filter -->
-                        <VBox styleClass="card" spacing="8" GridPane.columnIndex="0">
+                        <VBox spacing="8">
                             <Label text="URL" styleClass="filter-label"/>
                             <HBox spacing="8">
                                 <ComboBox styleClass="combo-box">
@@ -75,7 +90,7 @@
                         </VBox>
 
                         <!-- Status Code Filter -->
-                        <VBox styleClass="card" spacing="8" GridPane.columnIndex="1">
+                        <VBox spacing="8">
                             <Label text="Status Code" styleClass="filter-label"/>
                             <HBox spacing="8">
                                 <ComboBox styleClass="combo-box">
@@ -90,8 +105,12 @@
                                 <TextField promptText="200 / 404 / 500..." styleClass="text-input" HBox.hgrow="ALWAYS"/>
                             </HBox>
                         </VBox>
-                    </GridPane>
-                </VBox>
+                    </VBox>
+                </HBox>
+
+
+
+
 
                 <!-- Results Section -->
                 <VBox spacing="12" prefWidth="1000">

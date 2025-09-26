@@ -26,6 +26,8 @@ public class ControllerV2 {
     private Label brokenLinksLabel;
     @FXML
     private Label webpagesLabel;
+    @FXML
+    private Label progressLabel;
 
     // Results table
     @FXML

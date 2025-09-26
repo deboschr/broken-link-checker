@@ -21,8 +21,9 @@
 
 /* ===== Stats ===== */
 .stat-subtitle {
-	-fx-font-size: 12px;
+	-fx-font-size: 14px;
 	-fx-text-fill: #9ca3af; /* gray-400 */
+	-fx-alignment: TOP_CENTER;
 }
 
 .stat-value {
