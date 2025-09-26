@@ -9,17 +9,20 @@ public class Result {
     private final int statusCode;
     private final Instant accessTime;
 
-    // key = URL halaman sumber, value = anchor text di halaman tersebut (boleh kosong/null)
-    private final Map<String, String> sourcePages;
+    /**
+     * Untuk menyimpan daftar halaman sumber dimana tautan ditemukan.
+     * key : url webpage
+     * value : anchor text
+     */
+    private final Map<String, String> webpages;
 
     public Result(String url, int statusCode, Instant accessTime) {
         this.url = url;
         this.statusCode = statusCode;
         this.accessTime = accessTime;
-        this.sourcePages = new HashMap<>();
+        this.webpages = new HashMap<>();
     }
 
-    // Getter
     public String getUrl() {
         return url;
     }
@@ -32,11 +35,11 @@ public class Result {
         return accessTime;
     }
 
-    public Map<String, String> getSourcePages() {
-        return sourcePages;
+    public Map<String, String> getWebpages() {
+        return webpages;
     }
 
-    public void addSourcePage(String pageUrl, String anchorText) {
-        this.sourcePages.put(pageUrl, anchorText);
+    public void addWebpage(String webpageUrl, String anchorText) {
+        this.webpages.put(webpageUrl, anchorText);
     }
 }
