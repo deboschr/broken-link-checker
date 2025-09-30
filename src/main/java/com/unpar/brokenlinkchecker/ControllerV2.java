@@ -10,60 +10,43 @@ import javafx.scene.control.*;
 
 import java.awt.Desktop;
 import java.net.URI;
-import java.time.Instant;
 
-public class Controller {
+/**
+ * Controller untuk view.fxml
+ */
+public class ControllerV2 {
 
-    // Input seed URL
-    @FXML
-    private TextField seedUrlField;
+    @FXML private TextField seedUrlField;
 
-    // Stats
-    @FXML
-    private Label totalLinksLabel;
-    @FXML
-    private Label brokenLinksLabel;
-    @FXML
-    private Label webpagesLabel;
-    @FXML
-    private Label progressLabel;
+    @FXML private Label totalLinksLabel;
+    @FXML private Label brokenLinksLabel;
+    @FXML private Label webpagesLabel;
+    @FXML private Label progressLabel;
 
-    // Results table
-    @FXML
-    private TableView<BrokenLink> resultsTable;
-    @FXML
-    private TableColumn<BrokenLink, String> statusColumn;
-    @FXML
-    private TableColumn<BrokenLink, String> urlColumn;
+    @FXML private TableView<BrokenLink> resultsTable;
+    @FXML private TableColumn<BrokenLink, String> statusColumn;
+    @FXML private TableColumn<BrokenLink, String> urlColumn;
 
-    // Data storage
     private final ObservableList<BrokenLink> results = FXCollections.observableArrayList();
-
-    // Task crawler (biar bisa dihentikan)
     private Task<Void> crawlTask;
 
     @FXML
     public void initialize() {
-        // Binding lebar kolom ke persentase
         statusColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.2));
         urlColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.8));
 
-        // Kolom status → pakai HttpStatus
         statusColumn.setCellValueFactory(cellData -> {
             int code = cellData.getValue().getStatusCode();
             String text = HttpStatus.getStatus(code);
             return new ReadOnlyStringWrapper(text);
         });
 
-        // Kolom URL → langsung dari property
         urlColumn.setCellValueFactory(cellData -> cellData.getValue().urlProperty());
-
         resultsTable.setItems(results);
 
-        // URL clickable hyperlink
+        // hyperlink di tabel
         urlColumn.setCellFactory(col -> new TableCell<>() {
             private final Hyperlink link = new Hyperlink();
-
             {
                 link.setOnAction(e -> {
                     String url = link.getText();
@@ -76,7 +59,6 @@ public class Controller {
                     }
                 });
             }
-
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -89,7 +71,8 @@ public class Controller {
             }
         });
 
-        updateStats();
+        progressLabel.setText(CrawlStatus.IDLE.getText());
+        updateStats(0, 0, 0);
     }
 
     @FXML
@@ -100,33 +83,30 @@ public class Controller {
             return;
         }
 
-        System.out.println("Start crawling: " + seedUrl);
-
-        // Reset data lama
         results.clear();
-        updateStats();
+        updateStats(0, 0, 0);
 
-        // Jalankan crawler di background task
         crawlTask = new Task<>() {
             @Override
             protected Void call() {
-                Crawler crawler = new Crawler(seedUrl);
+                CrawlerV2 crawler = new CrawlerV2(seedUrl);
 
-                crawler.startCrawling(brokenLink -> {
-                    if (isCancelled()) return; // stop kalau user tekan "Stop"
-
-                    Platform.runLater(() -> {
-                        results.add(brokenLink);
-                        updateStats();
-                    });
-                });
-
+                crawler.startCrawling(
+                        brokenLink -> Platform.runLater(() -> {
+                            if (!results.contains(brokenLink)) {
+                                results.add(brokenLink);
+                            }
+                            updateStats();
+                        }),
+                        totalLinks -> Platform.runLater(() -> updateStats(totalLinks)),
+                        status -> Platform.runLater(() -> progressLabel.setText(status.getText()))
+                );
                 return null;
             }
         };
 
         Thread thread = new Thread(crawlTask);
-        thread.setDaemon(true); // mati otomatis saat app ditutup
+        thread.setDaemon(true);
         thread.start();
     }
 
@@ -134,7 +114,7 @@ public class Controller {
     private void onStopClick() {
         if (crawlTask != null && crawlTask.isRunning()) {
             crawlTask.cancel();
-            showAlert("Crawling stopped.");
+            progressLabel.setText(CrawlStatus.STOPPED.getText());
         } else {
             showAlert("No crawling task is running.");
         }
@@ -146,20 +126,22 @@ public class Controller {
     }
 
     private void updateStats() {
-        int total = results.size();
-        long broken = results.stream()
-                .filter(r -> r.getStatusCode() >= 400 || r.getStatusCode() == 0)
-                .count();
-        long webpages = results.stream()
-                .filter(r -> r.getStatusCode() < 400 && r.getStatusCode() != 0)
-                .count();
+        int total = Integer.parseInt(totalLinksLabel.getText());
+        long broken = results.size();
+        long webpages = total - broken;
+        updateStats(total, broken, webpages);
+    }
 
+    private void updateStats(int total, long broken, long webpages) {
         totalLinksLabel.setText(String.valueOf(total));
         brokenLinksLabel.setText(String.valueOf(broken));
         webpagesLabel.setText(String.valueOf(webpages));
+    }
 
-        // Progress sementara (belum real)
-        progressLabel.setText(total == 0 ? "0%" : "…");
+    private void updateStats(int total) {
+        long broken = results.size();
+        long webpages = total - broken;
+        updateStats(total, broken, webpages);
     }
 
     private void showAlert(String message) {
