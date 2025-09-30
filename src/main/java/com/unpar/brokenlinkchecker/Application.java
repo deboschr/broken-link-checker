@@ -29,7 +29,7 @@ public class Application extends javafx.application.Application {
         // Bungkus root node ke dalam Scene
         Scene scene = new Scene(root);
 
-        // ✅ Apply CSS (supaya dark mode aktif)
+        // Apply CSS
         scene.getStylesheets().add(
                 Objects.requireNonNull(getClass().getResource("/com/unpar/brokenlinkchecker/style.css"))
                         .toExternalForm());

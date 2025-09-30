@@ -33,7 +33,7 @@ javafx {
     version = '23'
     modules = ['javafx.controls', 'javafx.fxml']
 }
-
+  
 dependencies {
     implementation 'org.jsoup:jsoup:1.21.2'
 

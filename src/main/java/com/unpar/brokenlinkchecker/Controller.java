@@ -11,7 +11,7 @@ import java.net.URI;
 import java.time.Instant;
 
 /**
- * Controller untuk view-v2.fxml
+ * Controller untuk view.fxml
  */
 public class Controller {
 
@@ -32,7 +32,7 @@ public class Controller {
     // Results table
     @FXML
     private TableView<BrokenLink> resultsTable;
-
+    // Result table column
     @FXML
     private TableColumn<BrokenLink, String> statusColumn;
     @FXML

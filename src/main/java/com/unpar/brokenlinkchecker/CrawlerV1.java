@@ -1,6 +1,7 @@
 package com.unpar.brokenlinkchecker;
 
 import com.unpar.brokenlinkchecker.BrokenLink;
+import com.unpar.brokenlinkchecker.WebpageLink;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,14 +16,16 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class Crawler {
-    private final String rootHost;
-    private final Frontier frontier;
-    private final Set<String> repositories;
-    
+public class CrawlerV1 {
+
+    private final String rootHost;      // host dari seed URL
+    private final Frontier frontier;    // antrian URL yang akan dicrawling
+    private final Set<String> repositories; // kumpulan URL supaya nggak ada yang dicek 2x
+
     private static final String USER_AGENT = "BrokenLinkChecker/1.0 (+https://github.com/jakeschr/broken-link-checker; contact: 6182001060@student.unpar.ac.id)";
     private static final int TIMEOUT = 10000;
 
+    // HttpClient bawaan Java buat ngecek link non-webpage (pakai HEAD/GET)
     private static final HttpClient httpClient = HttpClient
             .newBuilder()
             .followRedirects(HttpClient.Redirect.NORMAL)    // otomatis follow redirect (301,302,dst)
@@ -30,14 +33,28 @@ public class Crawler {
             .version(HttpClient.Version.HTTP_1_1)           // pakai HTTP/1.1
             .build();
 
-    public Crawler(String seedUrl) {
+    /**
+     * Constructor: bikin crawler baru dari seed URL.
+     * - Ambil host root dari seed.
+     * - Siapin set repository biar URL unik.
+     * - Masukin seed URL ke frontier supaya jadi titik awal crawl.
+     */
+    public CrawlerV1(String seedUrl) {
         this.rootHost = URI.create(seedUrl).getHost().toLowerCase();
         this.repositories = new HashSet<>();
         this.frontier = new Frontier();
 
         frontier.enqueue(seedUrl);
-    } 
+    }
 
+    /**
+     * Fungsi utama buat ngecrawl.
+     * - Ambil URL dari frontier satu per satu.
+     * - Kalau URL baru maka request ke server terus ambil status + HTML.
+     * - Simpan hasil sebagai WebpageLink atau BrokenLink.
+     * - Ekstrak semua link dari halaman, lalu tentukan apakah link itu halaman lagi (lanjut crawl) atau link resource (cukup dicek status).
+     * - Setiap kali dapat hasil, dikirim lewat Consumer ke UI.
+     */
     public void startCrawling(Consumer<BrokenLink> streamBrokenLink) {
 
         while (!frontier.isEmpty()) {
@@ -86,6 +103,9 @@ public class Crawler {
             // ekstrak semua link di halaman
             Map<String, String> linksOnWebpage = extractLinks(doc);
 
+
+            // proses tiap link yang ditemukan
+
             for (Map.Entry<String, String> entry : linksOnWebpage.entrySet()) {
                 // kalau link masih satu host (same domain) maka anggap ini berpotensi jadi halaman
                 if (isPotentialWebpage(entry.getKey())) {
@@ -104,17 +124,94 @@ public class Crawler {
 
                     // kalau rusak, update info & kirim ke stream
                     if (blStatusCode >= 400 || blStatusCode == 0) {
-                        BrokenLink bl = new BrokenLink(entry.getKey(), blStatusCode, Instant.now());
-                        bl.addWebpage(webpageLink, entry.getValue());
-                        streamBrokenLink.accept(bl);
+                        bl.setStatusCode(blStatusCode);
+                        bl.setWebpageUrl(webpageLink);
+                        streamBrokenLink.accept(new BrokenLink(entry.getKey(), blStatusCode, Instant.now()));
                     }
                 }
 
             }
+
+            for (BrokenLink bl : linksOnWebpage) {
+
+                // kalau link masih satu host (same domain) maka anggap ini berpotensi jadi halaman
+                if (isPotentialWebpage(bl.getUrl())) {
+                    if (!repositories.contains(bl.getUrl())) {
+                        frontier.enqueue(bl.getUrl());
+                    }
+                }
+                // kalau bukan halaman (misal gambar, css, js, dll.)
+                else {
+                    if (!repositories.add(bl.getUrl())) {
+                        continue;
+                    }
+
+                    // cek status link
+                    int blStatusCode = fetchUrl(bl.getUrl());
+
+                    // kalau rusak, update info & kirim ke stream
+                    if (blStatusCode >= 400 || blStatusCode == 0) {
+                        bl.setStatusCode(blStatusCode);
+                        bl.setWebpageUrl(webpageLink);
+                        streamBrokenLink.accept(bl);
+                    }
+                }
+            }
         }
     }
-    
-    private static String canonization(String rawUrl) {
+
+    private Map<String, String> extractLinks(Document doc) {
+        Map<String, String> results = new HashMap<>();
+
+        for (Element a : doc.select("a[href]")) {
+            String absoluteUrl = a.attr("abs:href");
+            String cleanedUrl = canonical(absoluteUrl);
+
+            if (cleanedUrl == null) continue;
+
+            String anchorText = a.text().trim();
+            results.put(cleanedUrl, anchorText); // URL jadi key, anchor jadi value
+        }
+
+        return results;
+    }
+
+    /**
+     * Cek apakah URL potensial jadi halaman (bisa dicrawl lagi).
+     * Syarat:
+     * - host sama dengan seed
+     * - bukan file resource (jpg, png, css, js, pdf, dll.)
+     */
+    private boolean isPotentialWebpage(String url) {
+        try {
+            URI uri = URI.create(url);
+            String host = uri.getHost();
+            if (host == null) return false;
+
+            boolean isSameHost = host.equalsIgnoreCase(rootHost);
+
+            String path = uri.getPath().toLowerCase();
+            boolean isFileResource =
+                    path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".png")
+                            || path.endsWith(".gif") || path.endsWith(".webp") || path.endsWith(".svg")
+                            || path.endsWith(".css") || path.endsWith(".js") || path.endsWith(".pdf")
+                            || path.endsWith(".zip") || path.endsWith(".rar") || path.endsWith(".7z")
+                            || path.endsWith(".mjs") || path.endsWith(".map") || path.endsWith(".json");
+
+            return !isFileResource && isSameHost;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Membersihkan URL biar konsisten.
+     * - scheme ke lowercase, hanya http/https
+     * - host ke lowercase (support IDN)
+     * - hapus port default (80, 443)
+     * - hapus fragment (#...) karena gak dikirim ke server
+     */
+    private static String canonical(String rawUrl) {
         if (rawUrl == null || rawUrl.trim().isEmpty()) return null;
 
         URI url;
@@ -126,13 +223,13 @@ public class Crawler {
 
         // scheme
         String scheme = url.getScheme();
-        if (scheme == null) return rawUrl;
+        if (scheme == null) return null;
         if (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https")) return null;
         scheme = scheme.toLowerCase();
 
         // host
         String host = url.getHost();
-        if (host == null || host.isEmpty()) return rawUrl;
+        if (host == null || host.isEmpty()) return null;
         try {
             host = IDN.toASCII(host).toLowerCase();
         } catch (Exception e) {
@@ -160,44 +257,12 @@ public class Crawler {
         }
     }
 
-    private Map<String, String> extractLinks(Document doc) {
-        Map<String, String> results = new HashMap<>();
-
-        for (Element a : doc.select("a[href]")) {
-            String absoluteUrl = a.attr("abs:href");
-            String cleanedUrl = canonization(absoluteUrl);
-
-            if (cleanedUrl == null) continue;
-
-            String anchorText = a.text().trim();
-            results.put(cleanedUrl, anchorText); // URL jadi key, anchor jadi value
-        }
-
-        return results;
-    }
-
-    private boolean isPotentialWebpage(String url) {
-        try {
-            URI uri = URI.create(url);
-            String host = uri.getHost();
-            if (host == null) return false;
-
-            boolean isSameHost = host.equalsIgnoreCase(rootHost);
-
-            String path = uri.getPath().toLowerCase();
-            boolean isFileResource =
-                    path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".png")
-                            || path.endsWith(".gif") || path.endsWith(".webp") || path.endsWith(".svg")
-                            || path.endsWith(".css") || path.endsWith(".js") || path.endsWith(".pdf")
-                            || path.endsWith(".zip") || path.endsWith(".rar") || path.endsWith(".7z")
-                            || path.endsWith(".mjs") || path.endsWith(".map") || path.endsWith(".json");
-
-            return !isFileResource && isSameHost;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
+    /**
+     * Cek status code sebuah URL non-webpage.
+     * - Pertama coba pakai HEAD request (lebih ringan).
+     * - Kalau gagal (status 405, 501, 999), fallback pakai GET.
+     * - Kalau error (exception), return 0.
+     */
     private int fetchUrl(String url) {
         List<Integer> fallbackStatusCode = Arrays.asList(405, 501, 999);
 
@@ -231,4 +296,3 @@ public class Crawler {
         }
     }
 }
-    
