@@ -40,25 +40,25 @@
                             <VBox alignment="CENTER" prefWidth="200" prefHeight="100" styleClass="card">
                                 <Label text="Checking Status" styleClass="card-subtitle"/>
                                 <Region VBox.vgrow="ALWAYS"/>
-                                <Label fx:id="checkingStatusLabel" text="50%" styleClass="card-value"/>
+                                <Label fx:id="checkingStatusLabel" styleClass="card-value"/>
                                 <Region VBox.vgrow="ALWAYS"/>
                             </VBox>
                             <VBox alignment="CENTER" prefWidth="200" prefHeight="100" styleClass="card">
                                 <Label text="Total Links" styleClass="card-subtitle"/>
                                 <Region VBox.vgrow="ALWAYS"/>
-                                <Label fx:id="totalLinksLabel" text="0" styleClass="card-value"/>
+                                <Label fx:id="totalLinksLabel" styleClass="card-value"/>
                                 <Region VBox.vgrow="ALWAYS"/>
                             </VBox>
                             <VBox alignment="CENTER" prefWidth="200" prefHeight="100" styleClass="card">
                                 <Label text="Webpage Links" styleClass="card-subtitle"/>
                                 <Region VBox.vgrow="ALWAYS"/>
-                                <Label fx:id="webpageLinksLabel" text="0" styleClass="card-value"/>
+                                <Label fx:id="webpageLinksLabel" styleClass="card-value"/>
                                 <Region VBox.vgrow="ALWAYS"/>
                             </VBox>
                             <VBox alignment="CENTER" prefWidth="200" prefHeight="100" styleClass="card">
                                 <Label text="Broken Links" styleClass="card-subtitle"/>
                                 <Region VBox.vgrow="ALWAYS"/>
-                                <Label fx:id="brokenLinksLabel" text="0" styleClass="card-value-red"/>
+                                <Label fx:id="brokenLinksLabel" styleClass="card-value-red"/>
                                 <Region VBox.vgrow="ALWAYS"/>
                             </VBox>
                         </HBox>

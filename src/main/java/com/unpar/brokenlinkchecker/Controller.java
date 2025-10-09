@@ -109,7 +109,7 @@ public class Controller {
    // ============================================================
 
    /**
-    * Tombol Start diklik → mulai proses crawling.
+    * Tombol Start diklik maka mulai proses crawling.
     */
    @FXML
    private void onStartClick() {
@@ -127,7 +127,7 @@ public class Controller {
          return;
       }
 
-      // Reset summary
+      // Reset summary dan tabel result
       summaryCard.setCheckingStatus(CheckingStatus.RUNNING);
       summaryCard.setTotalLinks(0);
       summaryCard.setWebpages(0);
@@ -177,7 +177,7 @@ public class Controller {
    }
 
    /**
-    * Tombol Stop diklik → hentikan proses crawling.
+    * Tombol Stop diklik maka hentikan proses crawling.
     */
    @FXML
    private void onStopClick() {
@@ -190,7 +190,7 @@ public class Controller {
    }
 
    /**
-    * Tombol Export diklik → ekspor hasil.
+    * Tombol Export diklik maka ekspor hasil.
     */
    @FXML
    private void onExportClick() {

@@ -1,7 +1,7 @@
 package com.unpar.brokenlinkchecker;
 
 public enum CheckingStatus {
-    IDLE(""),
+    IDLE("....."),
     RUNNING("Running"),
     STOPPED("Stopped"),
     COMPLETED("Completed");
