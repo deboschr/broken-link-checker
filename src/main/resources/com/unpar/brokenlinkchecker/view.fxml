@@ -25,8 +25,8 @@
                     <HBox spacing="12">
                         <TextField fx:id="seedUrlField" promptText="https://example.com"
                                    styleClass="text-input" HBox.hgrow="ALWAYS"/>
-                        <Button text="Start Crawling" onAction="#onStartClick" styleClass="button-primary"/>
-                        <Button text="Stop Crawling" onAction="#onStopClick" styleClass="button-secondary"/>
+                        <Button text="Start" onAction="#onStartClick" styleClass="button-primary"/>
+                        <Button text="Stop" onAction="#onStopClick" styleClass="button-secondary"/>
                     </HBox>
                 </VBox>
 
