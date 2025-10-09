@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
  * Model BrokenLink untuk TableView
  */
@@ -29,7 +28,8 @@ public class BrokenLink {
         this.webpages = new HashMap<>();
     }
 
-    // ===== URL =====
+    //===============================================================================
+    // URL
     public String getUrl() {
         return url.get();
     }
@@ -42,7 +42,8 @@ public class BrokenLink {
         return url;
     }
 
-    // ===== Status =====
+    //===============================================================================
+    // Status
     public String getStatus() {
         return status.get();
     }
@@ -55,7 +56,8 @@ public class BrokenLink {
         return status;
     }
 
-    // ===== Access Time =====
+    //===============================================================================
+    // Access Time
     public Instant getAccessTime() {
         return accessTime.get();
     }
@@ -68,7 +70,8 @@ public class BrokenLink {
         return accessTime;
     }
 
-    // ===== Webpages (sumber tautan) =====
+    //===============================================================================
+    // Webpages (sumber tautan)
     public Map<String, String> getWebpages() {
         return webpages;
     }
