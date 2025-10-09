@@ -28,7 +28,7 @@ public class BrokenLink {
         this.webpages = new HashMap<>();
     }
 
-    //===============================================================================
+    // ===============================================================================
     // URL
     public String getUrl() {
         return url.get();
@@ -42,12 +42,14 @@ public class BrokenLink {
         return url;
     }
 
-    //===============================================================================
+    // ===============================================================================
     // Status
     public String getStatus() {
         return status.get();
     }
 
+    // ini dipakai kalau status code yang dikirim di contractor tidak valid misalnya
+    // 0 atau 999 maka artinya errornya perperti koneksi error dll
     public void setStatus(String value) {
         status.set(value);
     }
@@ -56,7 +58,7 @@ public class BrokenLink {
         return status;
     }
 
-    //===============================================================================
+    // ===============================================================================
     // Access Time
     public Instant getAccessTime() {
         return accessTime.get();
@@ -70,8 +72,8 @@ public class BrokenLink {
         return accessTime;
     }
 
-    //===============================================================================
-    // Webpages (sumber tautan)
+    // ===============================================================================
+    // Webpages
     public Map<String, String> getWebpages() {
         return webpages;
     }

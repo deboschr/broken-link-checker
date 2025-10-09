@@ -1,33 +1,39 @@
 package com.unpar.brokenlinkchecker;
 
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-
 import java.awt.Desktop;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Instant;
 
-import com.unpar.brokenlinkchecker.BrokenLink;
-import com.unpar.brokenlinkchecker.ProgressStatus;
-import com.unpar.brokenlinkchecker.HttpStatus;
-
+/**
+ * Controller utama untuk mengelola interaksi UI dan logika crawling.
+ */
 public class Controller {
+
+   // ============================================================
+   // FXML ELEMENTS
+   // ============================================================
 
    @FXML
    private TextField seedUrlField;
 
    @FXML
+   private Label checkingStatusLabel;
+   @FXML
    private Label totalLinksLabel;
    @FXML
+   private Label webpageLinksLabel;
+   @FXML
    private Label brokenLinksLabel;
-   @FXML
-   private Label webpagesLabel;
-   @FXML
-   private Label progressLabel;
 
    @FXML
    private TableView<BrokenLink> resultsTable;
@@ -36,78 +42,131 @@ public class Controller {
    @FXML
    private TableColumn<BrokenLink, String> urlColumn;
 
+   // ============================================================
+   // DATA & STATE
+   // ============================================================
+
    private final ObservableList<BrokenLink> results = FXCollections.observableArrayList();
+   private final SummaryCard summaryCard = new SummaryCard();
    private Task<Void> crawlTask;
+
+   // ============================================================
+   // INITIALIZATION
+   // ============================================================
 
    @FXML
    public void initialize() {
-      statusColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.2));
-      urlColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.8));
-
-      statusColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
-      urlColumn.setCellValueFactory(cellData -> cellData.getValue().urlProperty());
-      resultsTable.setItems(results);
-
-      // hyperlink di tabel
-      urlColumn.setCellFactory(col -> new TableCell<>() {
-         private final Hyperlink link = new Hyperlink();
-         {
-            link.setOnAction(e -> {
-               String url = link.getText();
-               try {
-                  if (Desktop.isDesktopSupported()) {
-                     Desktop.getDesktop().browse(new URI(url));
-                  }
-               } catch (Exception ex) {
-                  ex.printStackTrace();
-               }
-            });
-         }
-
-         @Override
-         protected void updateItem(String item, boolean empty) {
-            super.updateItem(item, empty);
-            if (empty || item == null) {
-               setGraphic(null);
-            } else {
-               link.setText(item);
-               setGraphic(link);
-            }
-         }
-      });
-
-      progressLabel.setText(ProgressStatus.IDLE.getText());
-      // updateSummaryCard(0, 0, 0);
+      bindSummaryLabels();
+      setupResultsTable();
    }
 
+   /**
+    * Binding antara SummaryCard dan label di UI
+    */
+   private void bindSummaryLabels() {
+      // Checking Status
+      summaryCard.checkingStatusProperty().addListener((obs, oldVal, newVal) -> {
+         checkingStatusLabel.setText(newVal.getText());
+      });
+
+      // Total Links
+      totalLinksLabel.textProperty().bind(summaryCard.totalLinksProperty().asString());
+
+      // Webpage Links
+      webpageLinksLabel.textProperty().bind(summaryCard.webpagesProperty().asString());
+
+      // Broken Links
+      brokenLinksLabel.textProperty().bind(summaryCard.brokenLinksProperty().asString());
+   }
+
+   /**
+    * Inisialisasi kolom tabel dan perilakunya.
+    */
+   private void setupResultsTable() {
+      resultsTable.setItems(results);
+
+      // Kolom Status → langsung pakai property dari BrokenLink
+      statusColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getStatus()));
+
+      // Kolom URL → langsung pakai property dari BrokenLink
+      urlColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getUrl()));
+
+      // Klik dua kali → buka URL di browser
+      resultsTable.setRowFactory(tv -> {
+         TableRow<BrokenLink> row = new TableRow<>();
+         row.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && !row.isEmpty()) {
+               BrokenLink link = row.getItem();
+               openUrl(link.getUrl());
+            }
+         });
+         return row;
+      });
+   }
+
+   // ============================================================
+   // EVENT HANDLERS
+   // ============================================================
+
+   /**
+    * Tombol Start diklik → mulai proses crawling.
+    */
    @FXML
    private void onStartClick() {
-      String seedUrl = seedUrlField.getText();
+      String rawUrl = seedUrlField.getText().trim();
 
-      String cleanedUrl = Crawler.normalizeUrl(seedUrl);
-
-      if (seedUrl == null || seedUrl.isBlank()) {
-         showAlert("Please enter a Seed URL first.");
+      if (rawUrl.isEmpty()) {
+         showAlert("Please enter a valid seed URL.");
          return;
       }
 
-      results.clear();
-      // updateSummaryCard(0, 0, 0);
+      // Normalisasi URL (gunakan utilitas dari Crawler)
+      String normalizedUrl = Crawler.normalizeUrl(rawUrl);
+      if (normalizedUrl == null) {
+         showAlert("Invalid URL. Make sure it includes a host and uses http or https.");
+         return;
+      }
 
+      // Reset summary
+      summaryCard.setCheckingStatus(CheckingStatus.RUNNING);
+      summaryCard.setTotalLinks(0);
+      summaryCard.setWebpages(0);
+      summaryCard.setBrokenLinks(0);
+      results.clear();
+
+      // Jalankan proses crawling di background thread
       crawlTask = new Task<>() {
          @Override
          protected Void call() {
-            Crawler crawler = new Crawler(seedUrl);
+            try {
+               // =====================================================
+               // >>> SEMENTARA: SIMULASI proses crawling dummy
+               // =====================================================
+               Platform.runLater(() -> summaryCard.setCheckingStatus(CheckingStatus.RUNNING));
 
-            crawler.startCrawling(
-                  brokenLink -> Platform.runLater(() -> {
-                     if (!results.contains(brokenLink)) {
-                        results.add(brokenLink);
-                     }
-                     updateSummaryCard();
-                  }),
-                  totalLinks -> Platform.runLater(() -> updateSummaryCard(totalLinks)),
-                  status -> Platform.runLater(() -> progressLabel.setText(status.getText())));
+               // Simulasi total 3 link rusak
+               for (int i = 1; i <= 3; i++) {
+                  Thread.sleep(1000); // delay untuk simulasi
+                  String url = "https://example.com/broken-" + i;
+                  int code = (i == 3) ? 500 : 404;
+
+                  BrokenLink brokenLink = new BrokenLink(url, code, Instant.now());
+                  brokenLink.addWebpage("https://example.com/source-" + i, "anchor text " + i);
+
+                  Platform.runLater(() -> {
+                     results.add(brokenLink);
+                     summaryCard.setBrokenLinks(summaryCard.getBrokenLinks() + 1);
+                     summaryCard.setTotalLinks(summaryCard.getTotalLinks() + 1);
+                     summaryCard.setWebpages(summaryCard.getWebpages() + 1);
+                  });
+               }
+
+               Platform.runLater(() -> summaryCard.setCheckingStatus(CheckingStatus.COMPLETED));
+
+            } catch (InterruptedException e) {
+               Platform.runLater(() -> summaryCard.setCheckingStatus(CheckingStatus.STOPPED));
+            }
+
             return null;
          }
       };
@@ -117,26 +176,51 @@ public class Controller {
       thread.start();
    }
 
+   /**
+    * Tombol Stop diklik → hentikan proses crawling.
+    */
    @FXML
    private void onStopClick() {
       if (crawlTask != null && crawlTask.isRunning()) {
          crawlTask.cancel();
-         progressLabel.setText(ProgressStatus.STOPPED.getText());
+         summaryCard.setCheckingStatus(CheckingStatus.STOPPED);
       } else {
-         showAlert("No crawling task is running.");
+         showAlert("No active crawling process.");
       }
    }
 
+   /**
+    * Tombol Export diklik → ekspor hasil.
+    */
    @FXML
    private void onExportClick() {
-      showAlert("Export not implemented yet.");
+      showAlert("Export feature not implemented yet.");
    }
 
+   // ============================================================
+   // UTILITIES
+   // ============================================================
+
+   /**
+    * Buka URL di browser default sistem.
+    */
+   private void openUrl(String url) {
+      try {
+         if (Desktop.isDesktopSupported()) {
+            Desktop.getDesktop().browse(new URI(url));
+         }
+      } catch (IOException | URISyntaxException e) {
+         showAlert("Failed to open URL: " + url);
+      }
+   }
+
+   /**
+    * Tampilkan pesan alert sederhana.
+    */
    private void showAlert(String message) {
       Alert alert = new Alert(Alert.AlertType.INFORMATION);
       alert.setHeaderText(null);
       alert.setContentText(message);
       alert.showAndWait();
    }
-
 }

@@ -20,19 +20,19 @@
 }
 
 /* ===== Stats ===== */
-.stat-subtitle {
+.card-subtitle {
 	-fx-font-size: 14px;
 	-fx-text-fill: #9ca3af; /* gray-400 */
 	-fx-alignment: TOP_CENTER;
 }
 
-.stat-value {
+.card-value {
 	-fx-font-size: 24px;
 	-fx-font-weight: bold;
 	-fx-text-fill: #f9fafb; /* white */
 }
 
-.stat-value-red {
+.card-value-red {
 	-fx-font-size: 24px;
 	-fx-font-weight: bold;
 	-fx-text-fill: #ef4444; /* red-500 */

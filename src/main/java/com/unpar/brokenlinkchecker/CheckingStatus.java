@@ -1,6 +1,6 @@
 package com.unpar.brokenlinkchecker;
 
-public enum ProgressStatus {
+public enum CheckingStatus {
     IDLE(""),
     RUNNING("Running"),
     STOPPED("Stopped"),
@@ -8,7 +8,7 @@ public enum ProgressStatus {
 
     private final String text;
 
-    ProgressStatus(String text) {
+    CheckingStatus(String text) {
         this.text = text;
     }
 
