@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker;
+package com.unpar.brokenlinkchecker.temp;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

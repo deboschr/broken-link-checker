@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker;
+package com.unpar.brokenlinkchecker.temp;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;

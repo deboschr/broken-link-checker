@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker;
+package com.unpar.brokenlinkchecker.version;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -11,21 +11,33 @@ import javafx.scene.control.*;
 import java.awt.Desktop;
 import java.net.URI;
 
+import com.unpar.brokenlinkchecker.temp.BrokenLink;
+import com.unpar.brokenlinkchecker.temp.CrawlStatus;
+import com.unpar.brokenlinkchecker.temp.HttpStatus;
+
 /**
  * Controller untuk view.fxml
  */
-public class ControllerV2 {
+public class Controller {
 
-    @FXML private TextField seedUrlField;
+    @FXML
+    private TextField seedUrlField;
 
-    @FXML private Label totalLinksLabel;
-    @FXML private Label brokenLinksLabel;
-    @FXML private Label webpagesLabel;
-    @FXML private Label progressLabel;
+    @FXML
+    private Label totalLinksLabel;
+    @FXML
+    private Label brokenLinksLabel;
+    @FXML
+    private Label webpagesLabel;
+    @FXML
+    private Label progressLabel;
 
-    @FXML private TableView<BrokenLink> resultsTable;
-    @FXML private TableColumn<BrokenLink, String> statusColumn;
-    @FXML private TableColumn<BrokenLink, String> urlColumn;
+    @FXML
+    private TableView<BrokenLink> resultsTable;
+    @FXML
+    private TableColumn<BrokenLink, String> statusColumn;
+    @FXML
+    private TableColumn<BrokenLink, String> urlColumn;
 
     private final ObservableList<BrokenLink> results = FXCollections.observableArrayList();
     private Task<Void> crawlTask;
@@ -59,6 +71,7 @@ public class ControllerV2 {
                     }
                 });
             }
+
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -89,7 +102,7 @@ public class ControllerV2 {
         crawlTask = new Task<>() {
             @Override
             protected Void call() {
-                CrawlerV2 crawler = new CrawlerV2(seedUrl);
+                Crawler crawler = new Crawler(seedUrl);
 
                 crawler.startCrawling(
                         brokenLink -> Platform.runLater(() -> {
@@ -99,8 +112,7 @@ public class ControllerV2 {
                             updateStats();
                         }),
                         totalLinks -> Platform.runLater(() -> updateStats(totalLinks)),
-                        status -> Platform.runLater(() -> progressLabel.setText(status.getText()))
-                );
+                        status -> Platform.runLater(() -> progressLabel.setText(status.getText())));
                 return null;
             }
         };

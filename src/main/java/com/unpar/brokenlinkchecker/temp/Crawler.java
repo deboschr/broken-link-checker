@@ -1,6 +1,5 @@
-package com.unpar.brokenlinkchecker;
+package com.unpar.brokenlinkchecker.temp;
 
-import com.unpar.brokenlinkchecker.BrokenLink;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

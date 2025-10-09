@@ -1,9 +1,13 @@
-package com.unpar.brokenlinkchecker;
+package com.unpar.brokenlinkchecker.version;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+
+import com.unpar.brokenlinkchecker.temp.BrokenLink;
+import com.unpar.brokenlinkchecker.temp.CrawlStatus;
+import com.unpar.brokenlinkchecker.temp.Frontier;
 
 import java.net.*;
 import java.net.http.HttpClient;
@@ -14,15 +18,14 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class CrawlerV2 {
+public class Crawler {
     private final String rootHost;
     private final Frontier frontier;
-    private final Set<String> repositories; // semua URL unik
-    private final Map<String, BrokenLink> brokenLinks; // cache broken links
+    private final Set<String> repositories;
+    private final Map<String, BrokenLink> brokenLinks;
 
     private static final String USER_AGENT = "BrokenLinkChecker/1.0 (+https://github.com/jakeschr/broken-link-checker; contact: 6182001060@student.unpar.ac.id)";
     private static final int TIMEOUT = 10000;
-
     private static final HttpClient httpClient = HttpClient
             .newBuilder()
             .followRedirects(HttpClient.Redirect.NORMAL)
@@ -30,7 +33,7 @@ public class CrawlerV2 {
             .version(HttpClient.Version.HTTP_1_1)
             .build();
 
-    public CrawlerV2(String seedUrl) {
+    public Crawler(String seedUrl) {
         this.rootHost = URI.create(seedUrl).getHost().toLowerCase();
         this.repositories = new HashSet<>();
         this.frontier = new Frontier();
@@ -42,8 +45,8 @@ public class CrawlerV2 {
     public void startCrawling(
             Consumer<BrokenLink> streamBrokenLink,
             Consumer<Integer> streamTotalLinks,
-            Consumer<CrawlStatus> streamStatus
-    ) {
+            Consumer<CrawlStatus> streamStatus) {
+
         streamStatus.accept(CrawlStatus.RUNNING);
 
         while (!frontier.isEmpty()) {
@@ -122,7 +125,7 @@ public class CrawlerV2 {
     }
 
     private void markBroken(String url, int statusCode, String sourcePage, String anchorText,
-                            Consumer<BrokenLink> streamBrokenLink) {
+            Consumer<BrokenLink> streamBrokenLink) {
         BrokenLink bl = brokenLinks.computeIfAbsent(url,
                 key -> new BrokenLink(key, statusCode, Instant.now()));
         bl.addWebpage(sourcePage, anchorText);
@@ -130,7 +133,8 @@ public class CrawlerV2 {
     }
 
     private static String canonization(String rawUrl) {
-        if (rawUrl == null || rawUrl.trim().isEmpty()) return null;
+        if (rawUrl == null || rawUrl.trim().isEmpty())
+            return null;
 
         URI url;
         try {
@@ -140,12 +144,15 @@ public class CrawlerV2 {
         }
 
         String scheme = url.getScheme();
-        if (scheme == null) return null;
-        if (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https")) return null;
+        if (scheme == null)
+            return null;
+        if (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https"))
+            return null;
         scheme = scheme.toLowerCase();
 
         String host = url.getHost();
-        if (host == null || host.isEmpty()) return null;
+        if (host == null || host.isEmpty())
+            return null;
         try {
             host = IDN.toASCII(host).toLowerCase();
         } catch (Exception e) {
@@ -158,7 +165,8 @@ public class CrawlerV2 {
         }
 
         String path = url.getPath();
-        if (path == null) path = "";
+        if (path == null)
+            path = "";
 
         String query = url.getRawQuery();
 
@@ -175,7 +183,8 @@ public class CrawlerV2 {
         for (Element a : doc.select("a[href]")) {
             String absoluteUrl = a.attr("abs:href");
             String cleanedUrl = canonization(absoluteUrl);
-            if (cleanedUrl == null) continue;
+            if (cleanedUrl == null)
+                continue;
 
             String anchorText = a.text().trim();
             results.put(cleanedUrl, anchorText);
@@ -187,17 +196,17 @@ public class CrawlerV2 {
         try {
             URI uri = URI.create(url);
             String host = uri.getHost();
-            if (host == null) return false;
+            if (host == null)
+                return false;
 
             boolean isSameHost = host.equalsIgnoreCase(rootHost);
 
             String path = uri.getPath().toLowerCase();
-            boolean isFileResource =
-                    path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".png")
-                            || path.endsWith(".gif") || path.endsWith(".webp") || path.endsWith(".svg")
-                            || path.endsWith(".css") || path.endsWith(".js") || path.endsWith(".pdf")
-                            || path.endsWith(".zip") || path.endsWith(".rar") || path.endsWith(".7z")
-                            || path.endsWith(".mjs") || path.endsWith(".map") || path.endsWith(".json");
+            boolean isFileResource = path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".png")
+                    || path.endsWith(".gif") || path.endsWith(".webp") || path.endsWith(".svg")
+                    || path.endsWith(".css") || path.endsWith(".js") || path.endsWith(".pdf")
+                    || path.endsWith(".zip") || path.endsWith(".rar") || path.endsWith(".7z")
+                    || path.endsWith(".mjs") || path.endsWith(".map") || path.endsWith(".json");
 
             return !isFileResource && isSameHost;
         } catch (Exception e) {
@@ -233,4 +242,3 @@ public class CrawlerV2 {
         }
     }
 }
-
