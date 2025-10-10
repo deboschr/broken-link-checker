@@ -69,13 +69,9 @@ public class Controller {
          checkingStatusLabel.setText(newVal.getText());
       });
 
-      // Total Links
+      checkingStatusLabel.setText(summaryCard.getCheckingStatus().getText());
       totalLinksLabel.textProperty().bind(summaryCard.totalLinksProperty().asString());
-
-      // Webpage Links
       webpageLinksLabel.textProperty().bind(summaryCard.webpagesProperty().asString());
-
-      // Broken Links
       brokenLinksLabel.textProperty().bind(summaryCard.brokenLinksProperty().asString());
    }
 
@@ -84,12 +80,20 @@ public class Controller {
     */
    private void setupResultsTable() {
       resultsTable.setItems(results);
+      resultsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
       // Kolom Status → langsung pakai property dari BrokenLink
       statusColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getStatus()));
 
       // Kolom URL → langsung pakai property dari BrokenLink
       urlColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getUrl()));
+
+      // Proporsi lebar kolom
+      resultsTable.widthProperty().addListener((obs, oldWidth, newWidth) -> {
+         double totalWidth = newWidth.doubleValue();
+         statusColumn.setPrefWidth(totalWidth * 0.25);
+         urlColumn.setPrefWidth(totalWidth * 0.75);
+      });
 
       // Klik dua kali → buka URL di browser
       resultsTable.setRowFactory(tv -> {

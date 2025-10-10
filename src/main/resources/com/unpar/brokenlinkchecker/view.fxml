@@ -107,13 +107,14 @@
 
                 <!-- Results Section -->
                 <VBox spacing="12" prefWidth="1000">
-                    <HBox alignment="CENTER_LEFT" spacing="12">
+                    <HBox spacing="12">
                         <Label text="Results" styleClass="card-value"/>
+                        <Region HBox.hgrow="ALWAYS"/>
                         <Button text="Export" onAction="#onExportClick" styleClass="button-secondary"/>
                     </HBox>
 
                     <!-- Results Table -->
-                    <TableView fx:id="resultsTable" prefHeight="400">
+                    <TableView fx:id="resultsTable" prefHeight="400" VBox.vgrow="ALWAYS">
                         <columns>
                             <TableColumn fx:id="statusColumn" text="Status" resizable="false"/>
                             <TableColumn fx:id="urlColumn" text="URL" resizable="false"/>

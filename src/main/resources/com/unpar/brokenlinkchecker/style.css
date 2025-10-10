@@ -95,6 +95,7 @@
 	-fx-background-color: #374151;
 }
 
+/* ========================================================================== */
 /* ===== TableView ===== */
 .table-view {
 	-fx-background-color: transparent;
@@ -132,18 +133,12 @@
 /* Isi tabel */
 .table-view .cell {
 	-fx-background-color: transparent;
-	-fx-border-color: transparent transparent #374151 transparent; /* hanya garis bawah */
+	-fx-border-color: transparent transparent #4b5563 transparent; /* hanya garis bawah */
 	-fx-border-width: 0 0 1px 0;
-	-fx-padding: 8px;
+	-fx-padding: 8px 12px;
 	-fx-font-size: 13px;
 	-fx-text-fill: #f9fafb;
 	-fx-alignment: CENTER_LEFT;
-}
-
-/* Hapus alternating row */
-.table-view .cell:odd,
-.table-view .cell:even {
-	-fx-background-color: transparent;
 }
 
 /* TableView placeholder (area kosong) */
