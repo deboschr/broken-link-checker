@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker.temp;
+package com.unpar.brokenlinkchecker.v3;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +56,11 @@ public class HttpStatus {
         STATUS_MAP.put(511, "511 Network Authentication Required");
     }
 
+    /**
+     * Akan mengembalikan status code + reason phrase berdasarkan key (status code)
+     * yang dikirim, dan akan mengembalikan status code itu sendiri (default) kalau
+     * tidak ada di map.
+     */
     public static String getStatus(int statusCode) {
         return STATUS_MAP.getOrDefault(statusCode, String.valueOf(statusCode));
     }

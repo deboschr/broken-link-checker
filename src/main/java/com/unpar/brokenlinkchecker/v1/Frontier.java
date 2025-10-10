@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker;
+package com.unpar.brokenlinkchecker.v1;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -7,7 +7,7 @@ import java.util.Queue;
  * Frontier adalah struktur data buat nyimpan daftar URL
  * yang bakal dicrawl berikutnya.
  *
- * Implementasi pakai queue (FIFO) - BFS.
+ * Implementasi sekarang pakai queue (FIFO).
  * Jadi link yang masuk duluan akan diproses duluan.
  */
 public class Frontier {
@@ -17,7 +17,7 @@ public class Frontier {
 
     /**
      * Tambahin URL baru ke frontier.
-     * URL akan ditaruh di belakang antrian.
+     * URL akan ditaruh di belakang antrian (offer).
      */
     public void enqueue(String url) {
         this.urls.offer(url);
@@ -27,9 +27,10 @@ public class Frontier {
      * Ambil URL berikutnya dari frontier.
      * - Kalau queue kosong maka return null.
      * - Kalau ada maka ambil elemen pertama (poll).
+     *   Artinya, URL paling awal masuk akan diproses duluan.
      */
     public String dequeue() {
-        return this.urls.poll();
+        return this.urls.poll(); // FIFO
     }
 
     /**

@@ -1,13 +1,13 @@
-package com.unpar.brokenlinkchecker.version;
+package com.unpar.brokenlinkchecker.v2;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.unpar.brokenlinkchecker.temp.BrokenLink;
-import com.unpar.brokenlinkchecker.temp.CrawlStatus;
-import com.unpar.brokenlinkchecker.temp.Frontier;
+import com.unpar.brokenlinkchecker.v1.BrokenLink;
+import com.unpar.brokenlinkchecker.v1.CrawlStatus;
+import com.unpar.brokenlinkchecker.v1.Frontier;
 
 import java.net.*;
 import java.net.http.HttpClient;

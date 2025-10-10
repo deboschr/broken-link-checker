@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker.version;
+package com.unpar.brokenlinkchecker.v2;
 
 import javafx.beans.property.*;
 import java.time.Instant;

@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker.temp;
+package com.unpar.brokenlinkchecker.v2;
 
 public enum CrawlStatus {
     IDLE("Belum mulai"),

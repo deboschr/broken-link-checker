@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker.version;
+package com.unpar.brokenlinkchecker.v2;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -11,9 +11,9 @@ import javafx.scene.control.*;
 import java.awt.Desktop;
 import java.net.URI;
 
-import com.unpar.brokenlinkchecker.temp.BrokenLink;
-import com.unpar.brokenlinkchecker.temp.CrawlStatus;
-import com.unpar.brokenlinkchecker.temp.HttpStatus;
+import com.unpar.brokenlinkchecker.v1.BrokenLink;
+import com.unpar.brokenlinkchecker.v1.CrawlStatus;
+import com.unpar.brokenlinkchecker.v1.HttpStatus;
 
 /**
  * Controller untuk view.fxml

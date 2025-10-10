@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker.temp;
+package com.unpar.brokenlinkchecker.v1;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;

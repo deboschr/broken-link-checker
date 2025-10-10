@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker.temp;
+package com.unpar.brokenlinkchecker.v3;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -30,9 +30,9 @@ public class Application extends javafx.application.Application {
         Scene scene = new Scene(root);
 
         // Apply CSS
-        scene.getStylesheets().add(
-                Objects.requireNonNull(getClass().getResource("/com/unpar/brokenlinkchecker/style.css"))
-                        .toExternalForm());
+        scene.getStylesheets().add(Objects
+                .requireNonNull(getClass().getResource("/com/unpar/brokenlinkchecker/style.css"))
+                .toExternalForm());
 
         // Set konfigurasi stage (window utama)
         stage.setTitle("BrokenLink Checker"); // judul window
