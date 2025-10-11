@@ -23,7 +23,7 @@ public class Application extends javafx.application.Application {
     @Override
     public void start(Stage stage) throws Exception {
         // Loader buat baca file FXML (layout utama aplikasi)
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/unpar/brokenlinkchecker/view.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/unpar/brokenlinkchecker/v2/view.fxml"));
         Parent root = loader.load();
 
         // Bungkus root node ke dalam Scene
@@ -31,7 +31,7 @@ public class Application extends javafx.application.Application {
 
         // Apply CSS
         scene.getStylesheets().add(Objects
-                .requireNonNull(getClass().getResource("/com/unpar/brokenlinkchecker/style.css"))
+                .requireNonNull(getClass().getResource("/com/unpar/brokenlinkchecker/v2/style.css"))
                 .toExternalForm());
 
         // Set konfigurasi stage (window utama)
