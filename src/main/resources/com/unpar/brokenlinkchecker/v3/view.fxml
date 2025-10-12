@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.unpar.brokenlinkchecker.Controller"
+            stylesheets="@style.css"
+            fx:id="root">
+
+    <!-- ========== TOP: SEED URL & BUTTONS ========== -->
+    <top>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <padding>
+                <Insets top="16" right="16" bottom="16" left="16"/>
+            </padding>
+            <Label text="Seed URL" styleClass="input-label"/>
+            <TextField fx:id="seedUrlField"
+                       promptText="https://informatika.unpar.ac.id"
+                       HBox.hgrow="ALWAYS"/>
+            <Button fx:id="startButton" text="Start" styleClass="btn-primary"/>
+            <Button fx:id="stopButton" text="Stop" styleClass="btn-secondary"/>
+        </HBox>
+    </top>
+
+    <!-- ========== CENTER: CONTENT ========== -->
+    <center>
+        <VBox spacing="20">
+            <padding>
+                <Insets top="16" right="16" bottom="16" left="16"/>
+            </padding>
+
+            <!-- ===== SUMMARY & FILTERS ===== -->
+            <HBox spacing="20">
+                <!-- === Summary === -->
+                <VBox spacing="14" prefWidth="600" styleClass="card">
+                    <Label text="Summary" styleClass="section-title"/>
+
+                    <GridPane hgap="12" vgap="12">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50"/>
+                            <ColumnConstraints percentWidth="50"/>
+                        </columnConstraints>
+
+                        <VBox alignment="CENTER" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="summary-box">
+                            <Label text="Checking Status" styleClass="summary-subtitle"/>
+                            <Label fx:id="statusLabel" text="Checking" styleClass="summary-value-blue"/>
+                        </VBox>
+
+                        <VBox alignment="CENTER" GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="summary-box">
+                            <Label text="Total Links" styleClass="summary-subtitle"/>
+                            <Label fx:id="totalLinksLabel" text="8,345" styleClass="summary-value"/>
+                        </VBox>
+
+                        <VBox alignment="CENTER" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="summary-box">
+                            <Label text="Webpage Links" styleClass="summary-subtitle"/>
+                            <Label fx:id="webpageLinksLabel" text="1,234" styleClass="summary-value"/>
+                        </VBox>
+
+                        <VBox alignment="CENTER" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="summary-box">
+                            <Label text="Broken Links" styleClass="summary-subtitle"/>
+                            <Label fx:id="brokenLinksLabel" text="234" styleClass="summary-value-red"/>
+                        </VBox>
+                    </GridPane>
+                </VBox>
+
+                <!-- === Filters === -->
+                <VBox spacing="14" prefWidth="400" styleClass="card">
+                    <Label text="Filters" styleClass="section-title"/>
+
+                    <VBox spacing="10">
+                        <Label text="URL" styleClass="filter-label"/>
+                        <HBox spacing="8">
+                            <ComboBox fx:id="urlSelectBox" promptText="Select" prefWidth="100"/>
+                            <TextField fx:id="urlFilterField" promptText="Enter URL" HBox.hgrow="ALWAYS"/>
+                        </HBox>
+                    </VBox>
+
+                    <VBox spacing="10">
+                        <Label text="Status Code" styleClass="filter-label"/>
+                        <HBox spacing="8">
+                            <ComboBox fx:id="statusSelectBox" promptText="Select" prefWidth="100"/>
+                            <TextField fx:id="statusFilterField" promptText="200 / 400 / 500..." HBox.hgrow="ALWAYS"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </HBox>
+
+            <!-- ===== RESULT ===== -->
+            <VBox spacing="12">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="Result" styleClass="section-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="exportButton" text="Export" styleClass="btn-export"/>
+                </HBox>
+
+                <TableView fx:id="resultTable" styleClass="result-table" prefHeight="400">
+                    <columns>
+                        <TableColumn fx:id="statusCol" text="Status" prefWidth="220"/>
+                        <TableColumn fx:id="urlCol" text="URL" prefWidth="620"/>
+                    </columns>
+                </TableView>
+
+                <HBox spacing="6" alignment="CENTER">
+                    <Button text="&lt;" styleClass="pagination-btn"/>
+                    <Button text="1" styleClass="pagination-btn active"/>
+                    <Button text="2" styleClass="pagination-btn"/>
+                    <Button text="3" styleClass="pagination-btn"/>
+                    <Button text="4" styleClass="pagination-btn"/>
+                    <Button text="5" styleClass="pagination-btn"/>
+                    <Button text="&gt;" styleClass="pagination-btn"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

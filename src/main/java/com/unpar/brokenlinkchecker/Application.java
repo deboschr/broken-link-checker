@@ -23,16 +23,16 @@ public class Application extends javafx.application.Application {
     @Override
     public void start(Stage stage) throws Exception {
         // Loader buat baca file FXML (layout utama aplikasi)
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/unpar/brokenlinkchecker/v2/view.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/unpar/brokenlinkchecker/v3/view.fxml"));
         Parent root = loader.load();
 
         // Bungkus root node ke dalam Scene
         Scene scene = new Scene(root);
 
         // Apply CSS
-        scene.getStylesheets().add(Objects
-                .requireNonNull(getClass().getResource("/com/unpar/brokenlinkchecker/v2/style.css"))
-                .toExternalForm());
+        // scene.getStylesheets().add(Objects
+        // .requireNonNull(getClass().getResource("/com/unpar/brokenlinkchecker/v3/style.css"))
+        // .toExternalForm());
 
         // Set konfigurasi stage (window utama)
         stage.setTitle("BrokenLink Checker"); // judul window
