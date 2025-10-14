@@ -1,228 +1,235 @@
-package com.unpar.brokenlinkchecker.v4;
+// package com.unpar.brokenlinkchecker.v4;
 
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.stage.Stage;
+// import javafx.application.Platform;
+// import javafx.collections.FXCollections;
+// import javafx.collections.ListChangeListener;
+// import javafx.collections.ObservableList;
+// import javafx.fxml.FXML;
+// import javafx.scene.control.*;
+// import javafx.scene.input.MouseEvent;
+// import javafx.scene.layout.BorderPane;
+// import javafx.scene.layout.HBox;
+// import javafx.scene.layout.Region;
+// import javafx.stage.Stage;
 
-import java.awt.Desktop;
-import java.net.URI;
-import java.time.Instant;
+// import java.awt.Desktop;
+// import java.net.URI;
+// import java.time.Instant;
 
-/**
- * Controller utama untuk UI Broken Link Checker
- */
-public class Controller {
+// /**
+//  * Controller utama untuk UI Broken Link Checker
+//  */
+// public class Controller {
 
-   @FXML
-   private BorderPane root;
+//    @FXML
+//    private BorderPane root;
 
-   // Title bar
-   @FXML
-   private HBox titleBar;
-   @FXML
-   private Button minimizeBtn, maximizeBtn, closeBtn;
+//    // Title bar
+//    @FXML
+//    private HBox titleBar;
+//    @FXML
+//    private Button minimizeBtn, maximizeBtn, closeBtn;
 
-   // Input + Control
-   @FXML
-   private TextField seedUrlField;
-   @FXML
-   private Button startBtn, stopBtn;
+//    // Input + Control
+//    @FXML
+//    private TextField seedUrlField;
+//    @FXML
+//    private Button startBtn, stopBtn;
 
-   // Summary
-   @FXML
-   private Label checkingStatusLabel;
-   @FXML
-   private Label totalLinksLabel;
-   @FXML
-   private Label webpageLinksLabel;
-   @FXML
-   private Label brokenLinksLabel;
+//    // Summary
+//    @FXML
+//    private Label checkingStatusLabel;
+//    @FXML
+//    private Label totalLinksLabel;
+//    @FXML
+//    private Label webpageLinksLabel;
+//    @FXML
+//    private Label brokenLinksLabel;
 
-   // Result Table
-   @FXML
-   private TableView<BrokenLink> resultTable;
-   @FXML
-   private TableColumn<BrokenLink, String> statusColumn;
-   @FXML
-   private TableColumn<BrokenLink, String> urlColumn;
-   @FXML
-   private Button exportBtn;
+//    // Result Table
+//    @FXML
+//    private TableView<BrokenLink> resultTable;
+//    @FXML
+//    private TableColumn<BrokenLink, String> statusColumn;
+//    @FXML
+//    private TableColumn<BrokenLink, String> urlColumn;
+//    @FXML
+//    private Button exportBtn;
 
-   // Pagination
-   @FXML
-   private Button prevPageBtn, nextPageBtn;
+//    // Pagination
+//    @FXML
+//    private Button prevPageBtn, nextPageBtn;
 
-   // Fields
-   private double xOffset = 0;
-   private double yOffset = 0;
-   private CheckingStatus currentCheckingStatus = CheckingStatus.IDLE;
-   private final ObservableList<BrokenLink> brokenLinks = FXCollections.observableArrayList();
+//    // Fields
+//    private double xOffset = 0;
+//    private double yOffset = 0;
+//    private CheckingStatus currentCheckingStatus = CheckingStatus.IDLE;
+//    private final ObservableList<BrokenLink> brokenLinks = FXCollections.observableArrayList();
 
-   @FXML
-   public void initialize() {
-      Platform.runLater(() -> {
-         initTitleBar();
-         initResultTable();
-      });
+//    private final SummaryCard summaryCard = new SummaryCard();
+//    private Crawler crawler;
 
-      updateStatusLabel();
-   }
+//    @FXML
+//    public void initialize() {
+//       Platform.runLater(() -> {
+//          initTitleBar();
+//          initResultTable();
+//       });
 
-   @FXML
-   private void onStartClick() {
-      currentCheckingStatus = CheckingStatus.CHECKING;
-      updateStatusLabel();
-      startBtn.getStyleClass().add("btn-start-active");
-      stopBtn.getStyleClass().remove("btn-stop-active");
-   }
+//       updateStatusLabel();
+//    }
 
-   @FXML
-   private void onStopClick() {
-      currentCheckingStatus = CheckingStatus.STOPPED;
-      updateStatusLabel();
-      stopBtn.getStyleClass().add("btn-stop-active");
-      startBtn.getStyleClass().remove("btn-start-active");
-   }
+//    @FXML
+//    private void onStartClick() {
+//       summaryCard.setCheckingStatus(CheckingStatus.CHECKING);
+//       startBtn.getStyleClass().add("btn-start-active");
+//       stopBtn.getStyleClass().remove("btn-stop-active");
 
-   @FXML
-   private void onExportClick() {
-      System.out.println("[EXPORT] fitur export belum diimplementasi.");
-   }
+//       String seedUrl = seedUrlField.getText();
+//       crawler = new Crawler(summaryCard, brokenLinks);
+//       crawler.start(seedUrl);
+//    }
 
-   private void initTitleBar() {
-      Stage stage = (Stage) titleBar.getScene().getWindow();
+//    @FXML
+//    private void onStopClick() {
+//       if (crawler != null)
+//          crawler.stop();
+//       summaryCard.setCheckingStatus(CheckingStatus.STOPPED);
+//       stopBtn.getStyleClass().add("btn-stop-active");
+//       startBtn.getStyleClass().remove("btn-start-active");
+//    }
 
-      titleBar.setOnMousePressed((MouseEvent e) -> {
-         xOffset = e.getSceneX();
-         yOffset = e.getSceneY();
-      });
+//    @FXML
+//    private void onExportClick() {
+//       System.out.println("[EXPORT] fitur export belum diimplementasi.");
+//    }
 
-      titleBar.setOnMouseDragged((MouseEvent e) -> {
-         stage.setX(e.getScreenX() - xOffset);
-         stage.setY(e.getScreenY() - yOffset);
-      });
+//    private void initTitleBar() {
+//       Stage stage = (Stage) titleBar.getScene().getWindow();
 
-      minimizeBtn.setOnAction(e -> stage.setIconified(true));
-      maximizeBtn.setOnAction(e -> stage.setMaximized(!stage.isMaximized()));
-      closeBtn.setOnAction(e -> stage.close());
-   }
+//       titleBar.setOnMousePressed((MouseEvent e) -> {
+//          xOffset = e.getSceneX();
+//          yOffset = e.getSceneY();
+//       });
 
-   private void updateStatusLabel() {
-      checkingStatusLabel.setText(currentCheckingStatus.getText());
-      checkingStatusLabel.getStyleClass().removeAll(
-            "status-idle", "status-checking", "status-stopped", "status-completed");
+//       titleBar.setOnMouseDragged((MouseEvent e) -> {
+//          stage.setX(e.getScreenX() - xOffset);
+//          stage.setY(e.getScreenY() - yOffset);
+//       });
 
-      switch (currentCheckingStatus) {
-         case IDLE -> checkingStatusLabel.getStyleClass().add("status-idle");
-         case CHECKING -> checkingStatusLabel.getStyleClass().add("status-checking");
-         case STOPPED -> checkingStatusLabel.getStyleClass().add("status-stopped");
-         case COMPLETED -> checkingStatusLabel.getStyleClass().add("status-completed");
-      }
-   }
+//       minimizeBtn.setOnAction(e -> stage.setIconified(true));
+//       maximizeBtn.setOnAction(e -> stage.setMaximized(!stage.isMaximized()));
+//       closeBtn.setOnAction(e -> stage.close());
+//    }
 
-   private void initResultTable() {
-      // atur lebar kolom
-      statusColumn.prefWidthProperty().bind(resultTable.widthProperty().multiply(0.2));
-      urlColumn.prefWidthProperty().bind(resultTable.widthProperty().multiply(0.8));
+//    private void updateStatusLabel() {
+//       checkingStatusLabel.setText(currentCheckingStatus.getText());
+//       checkingStatusLabel.getStyleClass().removeAll(
+//             "status-idle", "status-checking", "status-stopped", "status-completed");
 
-      // Set binding data
-      statusColumn.setCellValueFactory(cell -> cell.getValue().statusProperty());
-      urlColumn.setCellValueFactory(cell -> cell.getValue().urlProperty());
-      resultTable.setItems(brokenLinks);
+//       switch (currentCheckingStatus) {
+//          case IDLE -> checkingStatusLabel.getStyleClass().add("status-idle");
+//          case CHECKING -> checkingStatusLabel.getStyleClass().add("status-checking");
+//          case STOPPED -> checkingStatusLabel.getStyleClass().add("status-stopped");
+//          case COMPLETED -> checkingStatusLabel.getStyleClass().add("status-completed");
+//       }
+//    }
 
-      // Matikan resize kolom
-      resultTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+//    private void initResultTable() {
+//       // atur lebar kolom
+//       statusColumn.prefWidthProperty().bind(resultTable.widthProperty().multiply(0.2));
+//       urlColumn.prefWidthProperty().bind(resultTable.widthProperty().multiply(0.8));
 
-      // STATUS COLUMN — teks berwarna
-      statusColumn.setCellFactory(col -> new TableCell<>() {
-         @Override
-         protected void updateItem(String status, boolean empty) {
-            super.updateItem(status, empty);
-            if (empty || status == null) {
-               setText(null);
-               setStyle("");
-            } else {
-               BrokenLink link = getTableView().getItems().get(getIndex());
-               int code = link.getStatusCode();
-               setText(status);
+//       // Set binding data
+//       statusColumn.setCellValueFactory(cell -> cell.getValue().statusProperty());
+//       urlColumn.setCellValueFactory(cell -> cell.getValue().urlProperty());
+//       resultTable.setItems(brokenLinks);
 
-               // warna merah untuk error
-               if (code >= 400 && code < 600)
-                  setStyle("-fx-text-fill: #ef4444;");
-               else
-                  setStyle("-fx-text-fill: #f9fafb;");
-            }
-         }
-      });
+//       // Matikan resize kolom
+//       resultTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-      // URL COLUMN — bisa di klik hyperlink
-      urlColumn.setCellFactory(col -> new TableCell<>() {
-         private final Hyperlink link = new Hyperlink();
+//       // STATUS COLUMN — teks berwarna
+//       statusColumn.setCellFactory(col -> new TableCell<>() {
+//          @Override
+//          protected void updateItem(String status, boolean empty) {
+//             super.updateItem(status, empty);
+//             if (empty || status == null) {
+//                setText(null);
+//                setStyle("");
+//             } else {
+//                BrokenLink link = getTableView().getItems().get(getIndex());
+//                int code = link.getStatusCode();
+//                setText(status);
 
-         {
-            link.setOnAction(e -> {
-               String url = link.getText();
-               try {
-                  if (Desktop.isDesktopSupported()) {
-                     Desktop.getDesktop().browse(new URI(url));
-                  }
-               } catch (Exception ex) {
-                  ex.printStackTrace();
-               }
-            });
-         }
+//                // warna merah untuk error
+//                if (code >= 400 && code < 600)
+//                   setStyle("-fx-text-fill: #ef4444;");
+//                else
+//                   setStyle("-fx-text-fill: #f9fafb;");
+//             }
+//          }
+//       });
 
-         @Override
-         protected void updateItem(String item, boolean empty) {
-            super.updateItem(item, empty);
-            if (empty || item == null) {
-               setGraphic(null);
-            } else {
-               link.setText(item);
-               link.setStyle("-fx-text-fill: #60a5fa; -fx-underline: true;");
-               setGraphic(link);
-            }
-         }
-      });
+//       // URL COLUMN — bisa di klik hyperlink
+//       urlColumn.setCellFactory(col -> new TableCell<>() {
+//          private final Hyperlink link = new Hyperlink();
 
-      // Dummy data (contoh)
-      brokenLinks.addAll(
-            new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
-            new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/penambangan-data/", 0, Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/data-science-untuk-domain-spesifik/", 404, Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/basisdata-dan-pemrograman-sql-untuk-big-data/", 0,
-                  Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
-            new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/penambangan-data/", 0, Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/data-science-untuk-domain-spesifik/", 404, Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/basisdata-dan-pemrograman-sql-untuk-big-data/", 0,
-                  Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
-            new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/penambangan-data/", 0, Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/data-science-untuk-domain-spesifik/", 404, Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/basisdata-dan-pemrograman-sql-untuk-big-data/", 0,
-                  Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
-            new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/penambangan-data/", 0, Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/data-science-untuk-domain-spesifik/", 404, Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/basisdata-dan-pemrograman-sql-untuk-big-data/", 0,
-                  Instant.now()),
-            new BrokenLink("https://informatika.unpar.ac.id/statistika-dengan-r/", 999, Instant.now()));
+//          {
+//             link.setOnAction(e -> {
+//                String url = link.getText();
+//                try {
+//                   if (Desktop.isDesktopSupported()) {
+//                      Desktop.getDesktop().browse(new URI(url));
+//                   }
+//                } catch (Exception ex) {
+//                   ex.printStackTrace();
+//                }
+//             });
+//          }
 
-      totalLinksLabel.setText(String.valueOf(brokenLinks.size()));
-      brokenLinksLabel.setText(String.valueOf(brokenLinks.size()));
-   }
+//          @Override
+//          protected void updateItem(String item, boolean empty) {
+//             super.updateItem(item, empty);
+//             if (empty || item == null) {
+//                setGraphic(null);
+//             } else {
+//                link.setText(item);
+//                link.setStyle("-fx-text-fill: #60a5fa; -fx-underline: true;");
+//                setGraphic(link);
+//             }
+//          }
+//       });
 
-}
+//       // Dummy data (contoh)
+//       brokenLinks.addAll(
+//             new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
+//             new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/penambangan-data/", 0, Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/data-science-untuk-domain-spesifik/", 404, Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/basisdata-dan-pemrograman-sql-untuk-big-data/", 0,
+//                   Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
+//             new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/penambangan-data/", 0, Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/data-science-untuk-domain-spesifik/", 404, Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/basisdata-dan-pemrograman-sql-untuk-big-data/", 0,
+//                   Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
+//             new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/penambangan-data/", 0, Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/data-science-untuk-domain-spesifik/", 404, Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/basisdata-dan-pemrograman-sql-untuk-big-data/", 0,
+//                   Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
+//             new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/penambangan-data/", 0, Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/data-science-untuk-domain-spesifik/", 404, Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/basisdata-dan-pemrograman-sql-untuk-big-data/", 0,
+//                   Instant.now()),
+//             new BrokenLink("https://informatika.unpar.ac.id/statistika-dengan-r/", 999, Instant.now()));
+
+//       totalLinksLabel.setText(String.valueOf(brokenLinks.size()));
+//       brokenLinksLabel.setText(String.valueOf(brokenLinks.size()));
+//    }
+
+// }
