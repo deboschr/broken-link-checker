@@ -9,7 +9,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
 import java.awt.Desktop;
@@ -72,29 +71,21 @@ public class Controller {
          initTitleBar();
          initResultTable();
       });
-
-      updateStatusLabel();
    }
 
    @FXML
    private void onStartClick() {
-      currentCheckingStatus = CheckingStatus.CHECKING;
-      updateStatusLabel();
-      startBtn.getStyleClass().add("btn-start-active");
-      stopBtn.getStyleClass().remove("btn-stop-active");
+      showAlert("Start not implemented yet.");
    }
 
    @FXML
    private void onStopClick() {
-      currentCheckingStatus = CheckingStatus.STOPPED;
-      updateStatusLabel();
-      stopBtn.getStyleClass().add("btn-stop-active");
-      startBtn.getStyleClass().remove("btn-start-active");
+      showAlert("Stop not implemented yet.");
    }
 
    @FXML
    private void onExportClick() {
-      System.out.println("[EXPORT] fitur export belum diimplementasi.");
+      showAlert("Export not implemented yet.");
    }
 
    private void initTitleBar() {
@@ -113,19 +104,6 @@ public class Controller {
       minimizeBtn.setOnAction(e -> stage.setIconified(true));
       maximizeBtn.setOnAction(e -> stage.setMaximized(!stage.isMaximized()));
       closeBtn.setOnAction(e -> stage.close());
-   }
-
-   private void updateStatusLabel() {
-      checkingStatusLabel.setText(currentCheckingStatus.getText());
-      checkingStatusLabel.getStyleClass().removeAll(
-            "status-idle", "status-checking", "status-stopped", "status-completed");
-
-      switch (currentCheckingStatus) {
-         case IDLE -> checkingStatusLabel.getStyleClass().add("status-idle");
-         case CHECKING -> checkingStatusLabel.getStyleClass().add("status-checking");
-         case STOPPED -> checkingStatusLabel.getStyleClass().add("status-stopped");
-         case COMPLETED -> checkingStatusLabel.getStyleClass().add("status-completed");
-      }
    }
 
    private void initResultTable() {
@@ -193,7 +171,7 @@ public class Controller {
          }
       });
 
-      // Dummy data (contoh)
+      // Data dummy
       brokenLinks.addAll(
             new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
             new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
@@ -220,9 +198,12 @@ public class Controller {
             new BrokenLink("https://informatika.unpar.ac.id/basisdata-dan-pemrograman-sql-untuk-big-data/", 0,
                   Instant.now()),
             new BrokenLink("https://informatika.unpar.ac.id/statistika-dengan-r/", 999, Instant.now()));
-
-      totalLinksLabel.setText(String.valueOf(brokenLinks.size()));
-      brokenLinksLabel.setText(String.valueOf(brokenLinks.size()));
    }
 
+   private void showAlert(String message) {
+      Alert alert = new Alert(Alert.AlertType.INFORMATION);
+      alert.setHeaderText(null);
+      alert.setContentText(message);
+      alert.showAndWait();
+   }
 }
