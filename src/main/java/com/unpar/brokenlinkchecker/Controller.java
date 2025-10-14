@@ -1,21 +1,32 @@
 package com.unpar.brokenlinkchecker;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
 public class Controller {
 
+   // =======================================
+   // =========== FXML Components ===========
+
+   // TITLE BAR
+   @FXML
+   private HBox titleBar;
+   @FXML
+   private Button minimizeBtn, maximizeBtn, closeBtn;
+
+   // INPUT URL & CONTROLL PROSSES
    @FXML
    private TextField seedUrlField;
    @FXML
-   private Button startButton;
-   @FXML
-   private Button stopButton;
-   @FXML
-   private Button exportButton;
+   private Button startBtn, stopBtn;
 
+   // SUMMARY
    @FXML
-   private Label statusLabel;
+   private Label checkingStatusLabel;
    @FXML
    private Label totalLinksLabel;
    @FXML
@@ -23,39 +34,81 @@ public class Controller {
    @FXML
    private Label brokenLinksLabel;
 
-   @FXML
-   private ComboBox<String> urlSelectBox;
-   @FXML
-   private TextField urlFilterField;
-   @FXML
-   private ComboBox<String> statusSelectBox;
-   @FXML
-   private TextField statusFilterField;
+   // =======================================
+   // =========== Private Fields ============
 
-   @FXML
-   private TableView<?> resultTable;
-   @FXML
-   private TableColumn<?, ?> statusCol;
-   @FXML
-   private TableColumn<?, ?> urlCol;
+   private double xOffset = 0;
+   private double yOffset = 0;
+   private CheckingStatus currentCheckingStatus = CheckingStatus.IDLE;
 
    @FXML
    public void initialize() {
-      // Inisialisasi awal TableView atau ComboBox bisa ditambahkan di sini
+      Platform.runLater(this::initTitleBar);
+
+      startBtn.setOnAction(e -> setActiveButton("start"));
+      stopBtn.setOnAction(e -> setActiveButton("stop"));
+
+      updateStatusLabel();
    }
 
-   @FXML
-   private void onStartClick() {
-      // TODO: mulai pemeriksaan tautan
+   private void initTitleBar() {
+      Stage stage = (Stage) titleBar.getScene().getWindow();
+
+      // --- Window Dragging ---
+      titleBar.setOnMousePressed((MouseEvent event) -> {
+         xOffset = event.getSceneX();
+         yOffset = event.getSceneY();
+      });
+
+      titleBar.setOnMouseDragged((MouseEvent event) -> {
+         stage.setX(event.getScreenX() - xOffset);
+         stage.setY(event.getScreenY() - yOffset);
+      });
+
+      // --- Control Buttons ---
+      closeBtn.setOnAction(e -> stage.close());
+
+      minimizeBtn.setOnAction(e -> stage.setIconified(true));
+
+      maximizeBtn.setOnAction(e -> stage.setMaximized(!stage.isMaximized()));
    }
 
-   @FXML
-   private void onStopClick() {
-      // TODO: hentikan pemeriksaan
+   private void setActiveButton(String active) {
+      startBtn.getStyleClass().removeAll("btn-start-active");
+      stopBtn.getStyleClass().removeAll("btn-stop-active");
+
+      if ("start".equals(active)) {
+         startBtn.getStyleClass().add("btn-start-active");
+      } else if ("stop".equals(active)) {
+         stopBtn.getStyleClass().add("btn-stop-active");
+      }
    }
 
-   @FXML
-   private void onExportClick() {
-      // TODO: ekspor hasil
+   private void updateStatusLabel() {
+      checkingStatusLabel.setText(currentCheckingStatus.getText());
+      checkingStatusLabel.getStyleClass().removeAll("status-idle", "status-checking", "status-stopped",
+            "status-completed");
+
+      switch (currentCheckingStatus) {
+         case IDLE -> checkingStatusLabel.getStyleClass().add("status-idle");
+         case CHECKING -> checkingStatusLabel.getStyleClass().add("status-checking");
+         case STOPPED -> checkingStatusLabel.getStyleClass().add("status-stopped");
+         case COMPLETED -> checkingStatusLabel.getStyleClass().add("status-completed");
+      }
    }
+
+   public void onStartClick() {
+      currentCheckingStatus = CheckingStatus.CHECKING;
+      updateStatusLabel();
+   }
+
+   public void onStopClick() {
+      currentCheckingStatus = CheckingStatus.STOPPED;
+      updateStatusLabel();
+   }
+
+   // @FXML
+   // private void onExportClick() {
+   // // TODO: ekspor hasil
+   // }
 }

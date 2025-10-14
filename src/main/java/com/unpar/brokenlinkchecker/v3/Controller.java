@@ -132,7 +132,7 @@ public class Controller {
       }
 
       // Reset summary dan tabel result
-      summaryCard.setCheckingStatus(CheckingStatus.RUNNING);
+      summaryCard.setCheckingStatus(CheckingStatus.CHECKING);
       summaryCard.setTotalLinks(0);
       summaryCard.setWebpages(0);
       summaryCard.setBrokenLinks(0);
@@ -146,7 +146,7 @@ public class Controller {
                // =====================================================
                // >>> SEMENTARA: SIMULASI proses crawling dummy
                // =====================================================
-               Platform.runLater(() -> summaryCard.setCheckingStatus(CheckingStatus.RUNNING));
+               Platform.runLater(() -> summaryCard.setCheckingStatus(CheckingStatus.CHECKING));
 
                // Simulasi total 3 link rusak
                for (int i = 1; i <= 3; i++) {

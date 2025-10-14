@@ -4,8 +4,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.util.Objects;
+import javafx.stage.StageStyle;
 
 public class Application extends javafx.application.Application {
 
@@ -18,26 +17,35 @@ public class Application extends javafx.application.Application {
 
     /**
      * Method start() otomatis dijalankan setelah method launch() dijalankan.
-     * Tugasnya: menyiapkan UI utama aplikasi.
+     * Tugasnya: menyiapkan GUI utama aplikasi.
      */
     @Override
     public void start(Stage stage) throws Exception {
         // Loader buat baca file FXML (layout utama aplikasi)
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/unpar/brokenlinkchecker/v3/view.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/unpar/brokenlinkchecker/view.fxml"));
         Parent root = loader.load();
 
         // Bungkus root node ke dalam Scene
         Scene scene = new Scene(root);
 
-        // Apply CSS
-        // scene.getStylesheets().add(Objects
-        // .requireNonNull(getClass().getResource("/com/unpar/brokenlinkchecker/v3/style.css"))
-        // .toExternalForm());
+        // Kasih scene ke stage
+        stage.setScene(scene);
 
-        // Set konfigurasi stage (window utama)
-        stage.setTitle("BrokenLink Checker"); // judul window
-        stage.setScene(scene); // kasih scene ke stage
-        stage.centerOnScreen(); // biar muncul di tengah layar
-        stage.show(); // tampilkan window
+        // Hilangkan title bar default
+        stage.initStyle(StageStyle.UNDECORATED);
+
+        // Konfigurasi ukuran (px)
+        stage.setMinWidth(1024);
+        stage.setMinHeight(600);
+
+        // Maximized window
+        stage.setMaximized(true);
+
+        // Biar muncul di tengah layar
+        stage.centerOnScreen();
+
+        // tampilkan window
+        stage.show();
     }
+
 }
