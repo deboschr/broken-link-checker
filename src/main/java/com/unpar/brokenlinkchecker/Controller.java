@@ -76,29 +76,6 @@ public class Controller {
       updateStatusLabel();
    }
 
-   private void initTitleBar() {
-      Stage stage = (Stage) titleBar.getScene().getWindow();
-
-      // === Window Drag ===
-      titleBar.setOnMousePressed((MouseEvent e) -> {
-         xOffset = e.getSceneX();
-         yOffset = e.getSceneY();
-      });
-
-      titleBar.setOnMouseDragged((MouseEvent e) -> {
-         stage.setX(e.getScreenX() - xOffset);
-         stage.setY(e.getScreenY() - yOffset);
-      });
-
-      // === Buttons ===
-      minimizeBtn.setOnAction(e -> stage.setIconified(true));
-      maximizeBtn.setOnAction(e -> stage.setMaximized(!stage.isMaximized()));
-      closeBtn.setOnAction(e -> stage.close());
-   }
-
-   // ===================================================
-   // =============== START / STOP ======================
-   // ===================================================
    @FXML
    private void onStartClick() {
       currentCheckingStatus = CheckingStatus.CHECKING;
@@ -115,9 +92,29 @@ public class Controller {
       startBtn.getStyleClass().remove("btn-start-active");
    }
 
-   // ===================================================
-   // =============== STATUS LABEL ======================
-   // ===================================================
+   @FXML
+   private void onExportClick() {
+      System.out.println("[EXPORT] fitur export belum diimplementasi.");
+   }
+
+   private void initTitleBar() {
+      Stage stage = (Stage) titleBar.getScene().getWindow();
+
+      titleBar.setOnMousePressed((MouseEvent e) -> {
+         xOffset = e.getSceneX();
+         yOffset = e.getSceneY();
+      });
+
+      titleBar.setOnMouseDragged((MouseEvent e) -> {
+         stage.setX(e.getScreenX() - xOffset);
+         stage.setY(e.getScreenY() - yOffset);
+      });
+
+      minimizeBtn.setOnAction(e -> stage.setIconified(true));
+      maximizeBtn.setOnAction(e -> stage.setMaximized(!stage.isMaximized()));
+      closeBtn.setOnAction(e -> stage.close());
+   }
+
    private void updateStatusLabel() {
       checkingStatusLabel.setText(currentCheckingStatus.getText());
       checkingStatusLabel.getStyleClass().removeAll(
@@ -131,21 +128,17 @@ public class Controller {
       }
    }
 
-   // ===================================================
-   // =============== RESULT TABLE ======================
-   // ===================================================
    private void initResultTable() {
-
-      // Kolom lebar proporsional
+      // atur lebar kolom
       statusColumn.prefWidthProperty().bind(resultTable.widthProperty().multiply(0.2));
       urlColumn.prefWidthProperty().bind(resultTable.widthProperty().multiply(0.8));
 
-      // Set data source
+      // Set binding data
       statusColumn.setCellValueFactory(cell -> cell.getValue().statusProperty());
       urlColumn.setCellValueFactory(cell -> cell.getValue().urlProperty());
       resultTable.setItems(brokenLinks);
 
-      // Matikan virtualisasi
+      // Matikan resize kolom
       resultTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
       // STATUS COLUMN — teks berwarna
@@ -170,7 +163,7 @@ public class Controller {
          }
       });
 
-      // URL COLUMN — clickable hyperlink
+      // URL COLUMN — bisa di klik hyperlink
       urlColumn.setCellFactory(col -> new TableCell<>() {
          private final Hyperlink link = new Hyperlink();
 
@@ -232,44 +225,4 @@ public class Controller {
       brokenLinksLabel.setText(String.valueOf(brokenLinks.size()));
    }
 
-   /**
-    * Menyesuaikan tinggi tabel berdasarkan jumlah baris yang ditampilkan
-    */
-   private void updateTableHeight() {
-      Platform.runLater(() -> {
-         double headerHeight = 32; // tinggi header
-         double rowHeight = 32; // tinggi setiap baris (sesuai CSS)
-         int rowCount = resultTable.getItems().size();
-         double totalHeight = headerHeight + (rowHeight * rowCount);
-
-         // batas minimum agar header tetap tampil
-         resultTable.setPrefHeight(Math.max(totalHeight, headerHeight + rowHeight));
-      });
-   }
-
-   // ===================================================
-   // =============== EXPORT =============================
-   // ===================================================
-   @FXML
-   private void onExportClick() {
-      System.out.println("[EXPORT] fitur export belum diimplementasi.");
-   }
-
-   // ===================================================
-   // =============== PAGINATION ========================
-   // ===================================================
-   @FXML
-   private void onPrevPageClick() {
-      System.out.println("[PAGE] Previous clicked");
-   }
-
-   @FXML
-   private void onNextPageClick() {
-      System.out.println("[PAGE] Next clicked");
-   }
-
-   @FXML
-   private void onPageClick() {
-      System.out.println("[PAGE] Number clicked");
-   }
 }

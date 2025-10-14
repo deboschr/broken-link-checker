@@ -52,14 +52,17 @@ public class Crawler {
         String scheme = url.getScheme();
         if (scheme == null)
             return rawUrl;
+
         if (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https"))
             return null;
+
         scheme = scheme.toLowerCase();
 
         // host
         String host = url.getHost();
         if (host == null || host.isEmpty())
-            return rawUrl;
+            return null;
+
         try {
             host = IDN.toASCII(host).toLowerCase();
         } catch (Exception e) {

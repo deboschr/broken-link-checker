@@ -5,9 +5,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Model BrokenLink untuk TableView
- */
 public class BrokenLink {
 
     private final StringProperty url;
