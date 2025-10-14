@@ -45,7 +45,7 @@ public class ControllerV2 {
     public void initialize() {
         // Binding lebar kolom ke persentase
         statusColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.2)); // 30%
-        urlColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.8));    // 70%
+        urlColumn.prefWidthProperty().bind(resultsTable.widthProperty().multiply(0.8)); // 70%
 
         // Set data ke kolom
         statusColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
@@ -86,11 +86,30 @@ public class ControllerV2 {
         results.add(new LinkResult("200 OK", "https://example.com/page1"));
         results.add(new LinkResult("404 Not Found", "https://example.com/broken"));
         results.add(new LinkResult("500 Internal Server Error", "https://example.com/error"));
+        results.add(new LinkResult("200 OK", "https://example.com/page1"));
+        results.add(new LinkResult("404 Not Found", "https://example.com/broken"));
+        results.add(new LinkResult("500 Internal Server Error", "https://example.com/error"));
+        results.add(new LinkResult("200 OK", "https://example.com/page1"));
+        results.add(new LinkResult("404 Not Found", "https://example.com/broken"));
+        results.add(new LinkResult("500 Internal Server Error", "https://example.com/error"));
+        results.add(new LinkResult("200 OK", "https://example.com/page1"));
+        results.add(new LinkResult("404 Not Found", "https://example.com/broken"));
+        results.add(new LinkResult("500 Internal Server Error", "https://example.com/error"));
+        results.add(new LinkResult("200 OK", "https://example.com/page1"));
+        results.add(new LinkResult("404 Not Found", "https://example.com/broken"));
+        results.add(new LinkResult("500 Internal Server Error", "https://example.com/error"));
+        results.add(new LinkResult("200 OK", "https://example.com/page1"));
+        results.add(new LinkResult("404 Not Found", "https://example.com/broken"));
+        results.add(new LinkResult("500 Internal Server Error", "https://example.com/error"));
+        results.add(new LinkResult("200 OK", "https://example.com/page1"));
+        results.add(new LinkResult("404 Not Found", "https://example.com/broken"));
+        results.add(new LinkResult("500 Internal Server Error", "https://example.com/error"));
+        results.add(new LinkResult("200 OK", "https://example.com/page1"));
+        results.add(new LinkResult("404 Not Found", "https://example.com/broken"));
+        results.add(new LinkResult("500 Internal Server Error", "https://example.com/error"));
 
         updateStats();
     }
-
-
 
     @FXML
     private void onStartClick() {
