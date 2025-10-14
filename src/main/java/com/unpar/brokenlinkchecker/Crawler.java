@@ -38,87 +38,88 @@ public class Crawler {
         frontier.enqueue(seedUrl);
     }
 
-    public void startCrawling(
-            Consumer<BrokenLink> streamBrokenLink,
-            Consumer<Integer> streamTotalLinks,
-            Consumer<CrawlStatus> streamStatus) {
+    // public void startCrawling(
+    // Consumer<BrokenLink> streamBrokenLink,
+    // Consumer<Integer> streamTotalLinks,
+    // Consumer<CrawlStatus> streamStatus) {
 
-        streamStatus.accept(CrawlStatus.RUNNING);
+    // streamStatus.accept(CrawlStatus.RUNNING);
 
-        while (!frontier.isEmpty()) {
-            String webpageLink = frontier.dequeue();
+    // while (!frontier.isEmpty()) {
+    // String webpageLink = frontier.dequeue();
 
-            // total links update hanya kalau ada yang baru
-            if (repositories.add(webpageLink)) {
-                streamTotalLinks.accept(repositories.size());
-            } else {
-                continue;
-            }
+    // // total links update hanya kalau ada yang baru
+    // if (repositories.add(webpageLink)) {
+    // streamTotalLinks.accept(repositories.size());
+    // } else {
+    // continue;
+    // }
 
-            Document doc;
-            int wlStatusCode = 0;
+    // Document doc;
+    // int wlStatusCode = 0;
 
-            try {
-                Connection.Response res = Jsoup
-                        .connect(webpageLink)
-                        .userAgent(USER_AGENT)
-                        .timeout(TIMEOUT)
-                        .followRedirects(true)
-                        .ignoreHttpErrors(true)
-                        .execute();
+    // try {
+    // Connection.Response res = Jsoup
+    // .connect(webpageLink)
+    // .userAgent(USER_AGENT)
+    // .timeout(TIMEOUT)
+    // .followRedirects(true)
+    // .ignoreHttpErrors(true)
+    // .execute();
 
-                wlStatusCode = res.statusCode();
+    // wlStatusCode = res.statusCode();
 
-                if (wlStatusCode >= 400 || wlStatusCode == 0) {
-                    markBroken(webpageLink, wlStatusCode, webpageLink, "(self)", streamBrokenLink);
-                    continue;
-                }
+    // if (wlStatusCode >= 400 || wlStatusCode == 0) {
+    // markBroken(webpageLink, wlStatusCode, webpageLink, "(self)",
+    // streamBrokenLink);
+    // continue;
+    // }
 
-                doc = res.parse();
-                if (doc.selectFirst("html") == null) {
-                    continue;
-                }
+    // doc = res.parse();
+    // if (doc.selectFirst("html") == null) {
+    // continue;
+    // }
 
-            } catch (Exception e) {
-                markBroken(webpageLink, 0, webpageLink, "(self)", streamBrokenLink);
-                continue;
-            }
+    // } catch (Exception e) {
+    // markBroken(webpageLink, 0, webpageLink, "(self)", streamBrokenLink);
+    // continue;
+    // }
 
-            // ekstrak link di halaman
-            Map<String, String> linksOnWebpage = extractLinks(doc);
+    // // ekstrak link di halaman
+    // Map<String, String> linksOnWebpage = extractLinks(doc);
 
-            for (Map.Entry<String, String> entry : linksOnWebpage.entrySet()) {
-                String url = entry.getKey();
-                String anchorText = entry.getValue();
+    // for (Map.Entry<String, String> entry : linksOnWebpage.entrySet()) {
+    // String url = entry.getKey();
+    // String anchorText = entry.getValue();
 
-                if (isPotentialWebpage(url)) {
-                    if (!repositories.contains(url)) {
-                        frontier.enqueue(url);
-                    }
-                } else {
-                    if (!repositories.add(url)) {
-                        // link sudah ada → kalau broken, update source
-                        BrokenLink bl = brokenLinks.get(url);
-                        if (bl != null) {
-                            bl.addWebpage(webpageLink, anchorText);
-                            streamBrokenLink.accept(bl);
-                        }
-                        continue;
-                    }
+    // if (isPotentialWebpage(url)) {
+    // if (!repositories.contains(url)) {
+    // frontier.enqueue(url);
+    // }
+    // } else {
+    // if (!repositories.add(url)) {
+    // // link sudah ada → kalau broken, update source
+    // BrokenLink bl = brokenLinks.get(url);
+    // if (bl != null) {
+    // bl.addWebpage(webpageLink, anchorText);
+    // streamBrokenLink.accept(bl);
+    // }
+    // continue;
+    // }
 
-                    streamTotalLinks.accept(repositories.size());
+    // streamTotalLinks.accept(repositories.size());
 
-                    int blStatusCode = fetchUrl(url);
+    // int blStatusCode = fetchUrl(url);
 
-                    if (blStatusCode >= 400 || blStatusCode == 0) {
-                        markBroken(url, blStatusCode, webpageLink, anchorText, streamBrokenLink);
-                    }
-                }
-            }
-        }
+    // if (blStatusCode >= 400 || blStatusCode == 0) {
+    // markBroken(url, blStatusCode, webpageLink, anchorText, streamBrokenLink);
+    // }
+    // }
+    // }
+    // }
 
-        streamStatus.accept(CrawlStatus.COMPLETED);
-    }
+    // streamStatus.accept(CrawlStatus.COMPLETED);
+    // }
 
     public static String normalizeUrl(String rawUrl) {
         if (rawUrl == null || rawUrl.trim().isEmpty()) {

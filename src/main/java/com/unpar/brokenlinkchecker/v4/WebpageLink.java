@@ -7,83 +7,26 @@ import java.util.Map;
 
 public class WebpageLink extends Link {
 
-   private final StringProperty url;
-   private final StringProperty status;
-   private final ObjectProperty<Instant> accessTime;
-   private final int statusCode;
-
    /**
-    * Daftar webpage dan anchor text dari BrokenLink
-    * key : url webpage
-    * value : anchor text
+    * key : objek BrokenLink yang ditemukan di halaman ini
+    * value : anchor text dari tautan rusak tersebut
     */
-   private final Map<String, String> webpages;
+   private final Map<BrokenLink, String> brokenLinks;
 
    public WebpageLink(String url, int statusCode, Instant accessTime) {
-      this.url = new SimpleStringProperty(url);
-      this.status = new SimpleStringProperty(HttpStatus.getStatus(statusCode));
-      this.accessTime = new SimpleObjectProperty<>(accessTime);
-      this.webpages = new HashMap<>();
-
-      this.statusCode = statusCode;
       super(url, statusCode, accessTime);
+      this.brokenLinks = new HashMap<>();
    }
 
-   // ===============================================================================
-   // URL
-   public String getUrl() {
-      return url.get();
+   public void addBrokenLink(BrokenLink brokenLink, String anchorText) {
+      if (!brokenLinks.containsKey(brokenLink)) {
+         brokenLinks.put(brokenLink, anchorText);
+         brokenLink.addWebpageLinks(this, anchorText);
+      }
    }
 
-   public void setUrl(String value) {
-      url.set(value);
+   public Map<BrokenLink, String> getBrokenLinks() {
+      return brokenLinks;
    }
 
-   public StringProperty urlProperty() {
-      return url;
-   }
-
-   // ===============================================================================
-   // Status
-   public String getStatus() {
-      return status.get();
-   }
-
-   // ini dipakai kalau status code yang dikirim di contractor tidak valid misalnya
-   // 0 atau 999 maka artinya errornya perperti koneksi error dll
-   public void setStatus(String value) {
-      status.set(value);
-   }
-
-   public StringProperty statusProperty() {
-      return status;
-   }
-
-   public int getStatusCode() {
-      return statusCode;
-   }
-
-   // ===============================================================================
-   // Access Time
-   public Instant getAccessTime() {
-      return accessTime.get();
-   }
-
-   public void setAccessTime(Instant value) {
-      accessTime.set(value);
-   }
-
-   public ObjectProperty<Instant> accessTimeProperty() {
-      return accessTime;
-   }
-
-   // ===============================================================================
-   // Webpages
-   public Map<String, String> getWebpages() {
-      return webpages;
-   }
-
-   public void addWebpage(String webpageUrl, String anchorText) {
-      this.webpages.put(webpageUrl, anchorText);
-   }
 }
