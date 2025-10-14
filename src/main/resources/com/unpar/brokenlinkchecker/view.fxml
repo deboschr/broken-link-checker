@@ -126,9 +126,10 @@
 
             <!-- ===================== RESULT TABLE ===================== -->
             <VBox spacing="12" VBox.vgrow="ALWAYS">
-                <HBox alignment="CENTER_RIGHT">
-                    <Label text="Result" styleClass="section-title" HBox.hgrow="ALWAYS" />
-                    <Button fx:id="exportBtn" text="Export" styleClass="btn-export" />
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label text="Result" styleClass="section-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="exportButton" text="Export" styleClass="btn-control"/>
                 </HBox>
 
                 <!-- ====== TableView ====== -->

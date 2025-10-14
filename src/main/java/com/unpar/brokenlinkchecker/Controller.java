@@ -1,30 +1,40 @@
 package com.unpar.brokenlinkchecker;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+import java.awt.Desktop;
+import java.net.URI;
+import java.time.Instant;
+
+/**
+ * Controller utama untuk UI Broken Link Checker
+ */
 public class Controller {
 
-   // =======================================
-   // =========== FXML Components ===========
+   @FXML
+   private BorderPane root;
 
-   // TITLE BAR
+   // Title bar
    @FXML
    private HBox titleBar;
    @FXML
    private Button minimizeBtn, maximizeBtn, closeBtn;
 
-   // INPUT URL & CONTROLL PROSSES
+   // Input + Control
    @FXML
    private TextField seedUrlField;
    @FXML
    private Button startBtn, stopBtn;
 
-   // SUMMARY
+   // Summary
    @FXML
    private Label checkingStatusLabel;
    @FXML
@@ -34,19 +44,32 @@ public class Controller {
    @FXML
    private Label brokenLinksLabel;
 
-   // =======================================
-   // =========== Private Fields ============
+   // Result Table
+   @FXML
+   private TableView<BrokenLink> resultTable;
+   @FXML
+   private TableColumn<BrokenLink, String> statusColumn;
+   @FXML
+   private TableColumn<BrokenLink, String> urlColumn;
+   @FXML
+   private Button exportBtn;
 
+   // Pagination
+   @FXML
+   private Button prevPageBtn, nextPageBtn;
+
+   // Fields
    private double xOffset = 0;
    private double yOffset = 0;
    private CheckingStatus currentCheckingStatus = CheckingStatus.IDLE;
+   private final ObservableList<BrokenLink> brokenLinks = FXCollections.observableArrayList();
 
    @FXML
    public void initialize() {
-      Platform.runLater(this::initTitleBar);
-
-      startBtn.setOnAction(e -> setActiveButton("start"));
-      stopBtn.setOnAction(e -> setActiveButton("stop"));
+      Platform.runLater(() -> {
+         initTitleBar();
+         initResultTable();
+      });
 
       updateStatusLabel();
    }
@@ -54,40 +77,49 @@ public class Controller {
    private void initTitleBar() {
       Stage stage = (Stage) titleBar.getScene().getWindow();
 
-      // --- Window Dragging ---
-      titleBar.setOnMousePressed((MouseEvent event) -> {
-         xOffset = event.getSceneX();
-         yOffset = event.getSceneY();
+      // === Window Drag ===
+      titleBar.setOnMousePressed((MouseEvent e) -> {
+         xOffset = e.getSceneX();
+         yOffset = e.getSceneY();
       });
 
-      titleBar.setOnMouseDragged((MouseEvent event) -> {
-         stage.setX(event.getScreenX() - xOffset);
-         stage.setY(event.getScreenY() - yOffset);
+      titleBar.setOnMouseDragged((MouseEvent e) -> {
+         stage.setX(e.getScreenX() - xOffset);
+         stage.setY(e.getScreenY() - yOffset);
       });
 
-      // --- Control Buttons ---
-      closeBtn.setOnAction(e -> stage.close());
-
+      // === Buttons ===
       minimizeBtn.setOnAction(e -> stage.setIconified(true));
-
       maximizeBtn.setOnAction(e -> stage.setMaximized(!stage.isMaximized()));
+      closeBtn.setOnAction(e -> stage.close());
    }
 
-   private void setActiveButton(String active) {
-      startBtn.getStyleClass().removeAll("btn-start-active");
-      stopBtn.getStyleClass().removeAll("btn-stop-active");
-
-      if ("start".equals(active)) {
-         startBtn.getStyleClass().add("btn-start-active");
-      } else if ("stop".equals(active)) {
-         stopBtn.getStyleClass().add("btn-stop-active");
-      }
+   // ===================================================
+   // =============== START / STOP ======================
+   // ===================================================
+   @FXML
+   private void onStartClick() {
+      currentCheckingStatus = CheckingStatus.CHECKING;
+      updateStatusLabel();
+      startBtn.getStyleClass().add("btn-start-active");
+      stopBtn.getStyleClass().remove("btn-stop-active");
    }
 
+   @FXML
+   private void onStopClick() {
+      currentCheckingStatus = CheckingStatus.STOPPED;
+      updateStatusLabel();
+      stopBtn.getStyleClass().add("btn-stop-active");
+      startBtn.getStyleClass().remove("btn-start-active");
+   }
+
+   // ===================================================
+   // =============== STATUS LABEL ======================
+   // ===================================================
    private void updateStatusLabel() {
       checkingStatusLabel.setText(currentCheckingStatus.getText());
-      checkingStatusLabel.getStyleClass().removeAll("status-idle", "status-checking", "status-stopped",
-            "status-completed");
+      checkingStatusLabel.getStyleClass().removeAll(
+            "status-idle", "status-checking", "status-stopped", "status-completed");
 
       switch (currentCheckingStatus) {
          case IDLE -> checkingStatusLabel.getStyleClass().add("status-idle");
@@ -97,18 +129,121 @@ public class Controller {
       }
    }
 
-   public void onStartClick() {
-      currentCheckingStatus = CheckingStatus.CHECKING;
-      updateStatusLabel();
+   // ===================================================
+   // =============== RESULT TABLE ======================
+   // ===================================================
+   private void initResultTable() {
+
+      statusColumn.prefWidthProperty().bind(resultTable.widthProperty().multiply(0.2));
+      urlColumn.prefWidthProperty().bind(resultTable.widthProperty().multiply(0.8));
+
+      statusColumn.setCellValueFactory(cell -> cell.getValue().statusProperty());
+      urlColumn.setCellValueFactory(cell -> cell.getValue().urlProperty());
+      resultTable.setItems(brokenLinks);
+
+      // Hapus kolom otomatis (kalau ada)
+      resultTable.getColumns().setAll(statusColumn, urlColumn);
+
+      // Agar lebar kolom tidak bisa diubah
+      resultTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+
+      /*
+       * ===============================
+       * STATUS COLUMN → teks berwarna
+       * ================================
+       */
+      statusColumn.setCellFactory(col -> new TableCell<>() {
+         @Override
+         protected void updateItem(String status, boolean empty) {
+            super.updateItem(status, empty);
+            if (empty || status == null) {
+               setText(null);
+               setStyle("");
+            } else {
+               BrokenLink link = getTableView().getItems().get(getIndex());
+               int code = link.getStatusCode();
+
+               setText(status);
+
+               // warna: merah untuk 4xx/5xx, putih untuk lainnya
+               if (code >= 400 && code < 600)
+                  setStyle("-fx-text-fill: #ef4444;");
+               else
+                  setStyle("-fx-text-fill: #f9fafb;");
+            }
+         }
+      });
+
+      /*
+       * ==================================
+       * URL COLUMN → hyperlink yang dapat di klik
+       * ===================================
+       */
+      urlColumn.setCellFactory(col -> new TableCell<>() {
+         private final Hyperlink link = new Hyperlink();
+         {
+            link.setOnAction(e -> {
+               String url = link.getText();
+               try {
+                  if (Desktop.isDesktopSupported()) {
+                     Desktop.getDesktop().browse(new URI(url));
+                  }
+               } catch (Exception ex) {
+                  ex.printStackTrace();
+               }
+            });
+         }
+
+         @Override
+         protected void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+               setGraphic(null);
+            } else {
+               link.setText(item);
+               link.setStyle("-fx-text-fill: #60a5fa; -fx-underline: true;"); // biru link
+               setGraphic(link);
+            }
+         }
+      });
+
+      // Dummy data
+      brokenLinks.addAll(
+            new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
+            new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/penambangan-data/", 0, Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/data-science-untuk-domain-spesifik/", 404, Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/basisdata-dan-pemrograman-sql-untuk-big-data/", 0,
+                  Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/statistika-dengan-r/", 999, Instant.now()));
+
+      totalLinksLabel.setText(String.valueOf(brokenLinks.size()));
+      brokenLinksLabel.setText(String.valueOf(brokenLinks.size()));
    }
 
-   public void onStopClick() {
-      currentCheckingStatus = CheckingStatus.STOPPED;
-      updateStatusLabel();
+   // ===================================================
+   // =============== EXPORT =============================
+   // ===================================================
+   @FXML
+   private void onExportClick() {
+      System.out.println("[EXPORT] fitur export belum diimplementasi.");
    }
 
-   // @FXML
-   // private void onExportClick() {
-   // // TODO: ekspor hasil
-   // }
+   // ===================================================
+   // =============== PAGINATION ========================
+   // ===================================================
+   @FXML
+   private void onPrevPageClick() {
+      System.out.println("[PAGE] Previous clicked");
+   }
+
+   @FXML
+   private void onNextPageClick() {
+      System.out.println("[PAGE] Next clicked");
+   }
+
+   @FXML
+   private void onPageClick() {
+      System.out.println("[PAGE] Number clicked");
+   }
 }
