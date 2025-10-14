@@ -242,11 +242,6 @@
 	-fx-background-color: #2a2a2a;
 }
 
-/* Scrollbar */
-.result-table .scroll-bar:vertical {
-	-fx-opacity: 0.3;
-}
-
 /* ===================== Pagination ===================== */
 .pagination-box {
 	-fx-alignment: CENTER;

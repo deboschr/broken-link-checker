@@ -32,6 +32,7 @@
 
 
     <center>
+        <ScrollPane fx:id="scrollRoot" fitToWidth="true" fitToHeight="false" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" style="-fx-background: transparent;">
         <VBox spacing="24" styleClass="content-root">
 
             <!-- ===================== INPUT & CONTROLL BUTTON ===================== -->
@@ -133,7 +134,7 @@
                 </HBox>
 
                 <!-- ====== TableView ====== -->
-                <TableView fx:id="resultTable" styleClass="result-table" VBox.vgrow="ALWAYS">
+                <TableView fx:id="resultTable" styleClass="result-table" VBox.vgrow="NEVER">
                     <columns>
                         <TableColumn fx:id="statusColumn" text="Status" prefWidth="200" />
                         <TableColumn fx:id="urlColumn" text="URL" prefWidth="700" />
@@ -142,17 +143,18 @@
 
                 <!-- ====== Pagination ====== -->
                 <HBox fx:id="paginationContainer" alignment="CENTER" spacing="6" styleClass="pagination-box">
-                    <Button text="◀" styleClass="page-btn" />
+                    <Button text="&lt;" styleClass="page-btn" />
                     <Button text="1" styleClass="page-btn-active" />
                     <Button text="2" styleClass="page-btn" />
                     <Button text="3" styleClass="page-btn" />
                     <Button text="4" styleClass="page-btn" />
                     <Button text="5" styleClass="page-btn" />
-                    <Button text="▶" styleClass="page-btn" />
+                    <Button text="&gt;" styleClass="page-btn" />
                 </HBox>
             </VBox>
 
         </VBox>
+        </ScrollPane>
     </center>
 
 </BorderPane>

@@ -33,6 +33,7 @@
 
     <!-- ===================== CENTER CONTENT ===================== -->
     <center>
+        
         <VBox spacing="24" styleClass="content-root">
 
             <!-- ===================== INPUT & CONTROL BUTTON ===================== -->
@@ -128,7 +129,7 @@
                     <Button fx:id="exportBtn" text="Export" styleClass="btn-export" onAction="#onExportClick"/>
                 </HBox>
 
-                <TableView fx:id="resultTable" styleClass="result-table" VBox.vgrow="ALWAYS">
+                <TableView fx:id="resultTable" styleClass="result-table" VBox.vgrow="NEVER">
                     <columns>
                         <TableColumn fx:id="statusColumn" text="Status" prefWidth="200" />
                         <TableColumn fx:id="urlColumn" text="URL" prefWidth="700" />

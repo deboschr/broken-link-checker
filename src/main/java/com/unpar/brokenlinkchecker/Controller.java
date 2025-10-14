@@ -2,12 +2,14 @@ package com.unpar.brokenlinkchecker;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
 import java.awt.Desktop;
@@ -134,24 +136,19 @@ public class Controller {
    // ===================================================
    private void initResultTable() {
 
+      // Kolom lebar proporsional
       statusColumn.prefWidthProperty().bind(resultTable.widthProperty().multiply(0.2));
       urlColumn.prefWidthProperty().bind(resultTable.widthProperty().multiply(0.8));
 
+      // Set data source
       statusColumn.setCellValueFactory(cell -> cell.getValue().statusProperty());
       urlColumn.setCellValueFactory(cell -> cell.getValue().urlProperty());
       resultTable.setItems(brokenLinks);
 
-      // Hapus kolom otomatis (kalau ada)
-      resultTable.getColumns().setAll(statusColumn, urlColumn);
-
-      // Agar lebar kolom tidak bisa diubah
+      // Matikan virtualisasi
       resultTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-      /*
-       * ===============================
-       * STATUS COLUMN → teks berwarna
-       * ================================
-       */
+      // STATUS COLUMN — teks berwarna
       statusColumn.setCellFactory(col -> new TableCell<>() {
          @Override
          protected void updateItem(String status, boolean empty) {
@@ -162,10 +159,9 @@ public class Controller {
             } else {
                BrokenLink link = getTableView().getItems().get(getIndex());
                int code = link.getStatusCode();
-
                setText(status);
 
-               // warna: merah untuk 4xx/5xx, putih untuk lainnya
+               // warna merah untuk error
                if (code >= 400 && code < 600)
                   setStyle("-fx-text-fill: #ef4444;");
                else
@@ -174,13 +170,10 @@ public class Controller {
          }
       });
 
-      /*
-       * ==================================
-       * URL COLUMN → hyperlink yang dapat di klik
-       * ===================================
-       */
+      // URL COLUMN — clickable hyperlink
       urlColumn.setCellFactory(col -> new TableCell<>() {
          private final Hyperlink link = new Hyperlink();
+
          {
             link.setOnAction(e -> {
                String url = link.getText();
@@ -201,14 +194,32 @@ public class Controller {
                setGraphic(null);
             } else {
                link.setText(item);
-               link.setStyle("-fx-text-fill: #60a5fa; -fx-underline: true;"); // biru link
+               link.setStyle("-fx-text-fill: #60a5fa; -fx-underline: true;");
                setGraphic(link);
             }
          }
       });
 
-      // Dummy data
+      // Dummy data (contoh)
       brokenLinks.addAll(
+            new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
+            new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/penambangan-data/", 0, Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/data-science-untuk-domain-spesifik/", 404, Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/basisdata-dan-pemrograman-sql-untuk-big-data/", 0,
+                  Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
+            new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/penambangan-data/", 0, Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/data-science-untuk-domain-spesifik/", 404, Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/basisdata-dan-pemrograman-sql-untuk-big-data/", 0,
+                  Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
+            new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/penambangan-data/", 0, Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/data-science-untuk-domain-spesifik/", 404, Instant.now()),
+            new BrokenLink("https://informatika.unpar.ac.id/basisdata-dan-pemrograman-sql-untuk-big-data/", 0,
+                  Instant.now()),
             new BrokenLink("https://informatika.unpar.ac.id/laboratorium-komputasi/", 500, Instant.now()),
             new BrokenLink("https://www.agatestudio.com/", 404, Instant.now()),
             new BrokenLink("https://informatika.unpar.ac.id/penambangan-data/", 0, Instant.now()),
@@ -219,6 +230,21 @@ public class Controller {
 
       totalLinksLabel.setText(String.valueOf(brokenLinks.size()));
       brokenLinksLabel.setText(String.valueOf(brokenLinks.size()));
+   }
+
+   /**
+    * Menyesuaikan tinggi tabel berdasarkan jumlah baris yang ditampilkan
+    */
+   private void updateTableHeight() {
+      Platform.runLater(() -> {
+         double headerHeight = 32; // tinggi header
+         double rowHeight = 32; // tinggi setiap baris (sesuai CSS)
+         int rowCount = resultTable.getItems().size();
+         double totalHeight = headerHeight + (rowHeight * rowCount);
+
+         // batas minimum agar header tetap tampil
+         resultTable.setPrefHeight(Math.max(totalHeight, headerHeight + rowHeight));
+      });
    }
 
    // ===================================================
