@@ -1,23 +1,24 @@
-package com.unpar.brokenlinkchecker.model;
+package com.unpar.brokenlinkchecker;
 
 import javafx.beans.property.*;
 import java.time.Instant;
-
-import com.unpar.brokenlinkchecker.util.HttpStatus;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Link {
 
    private final StringProperty url;
-   private final StringProperty status;
+   private final IntegerProperty statusCode;
    private final ObjectProperty<Instant> accessTime;
-   private final int statusCode;
+
+   private final Set<Link> connections;
 
    public Link(String url, int statusCode, Instant accessTime) {
       this.url = new SimpleStringProperty(url);
-      this.status = new SimpleStringProperty(HttpStatus.getStatus(statusCode));
+      this.statusCode = new SimpleIntegerProperty(statusCode);
       this.accessTime = new SimpleObjectProperty<>(accessTime);
 
-      this.statusCode = statusCode;
+      this.connections = new HashSet<>();
    }
 
    // ===============================================================================
@@ -35,22 +36,16 @@ public class Link {
    }
 
    // ===============================================================================
-   // Status
-   public String getStatus() {
-      return status.get();
-   }
-
-   // ini dipakai kalau status code yang dikirim di contractor tidak valid misalnya
-   // 0 atau 999 maka artinya errornya perperti koneksi error dll
-   public void setStatus(String value) {
-      status.set(value);
-   }
-
-   public StringProperty statusProperty() {
-      return status;
-   }
-
+   // Status Cod
    public int getStatusCode() {
+      return statusCode.get();
+   }
+
+   public void setStatusCode(int value) {
+      statusCode.set(value);
+   }
+
+   public IntegerProperty statusProperty() {
       return statusCode;
    }
 
@@ -66,5 +61,20 @@ public class Link {
 
    public ObjectProperty<Instant> accessTimeProperty() {
       return accessTime;
+   }
+
+   // ===============================================================================
+   // Utils
+   public void connect(Link other) {
+      if (other == null || other == this) {
+         return;
+      }
+
+      this.connections.add(other);
+      other.connections.add(this);
+   }
+
+   public Set<Link> getConnections() {
+      return connections;
    }
 }

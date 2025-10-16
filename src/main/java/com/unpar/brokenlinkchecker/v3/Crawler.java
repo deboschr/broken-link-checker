@@ -36,7 +36,7 @@ public class Crawler {
         frontier.enqueue(seedUrl);
     }
 
-    public static String normalizeUrl(String rawUrl) {
+    public String normalizeUrl(String rawUrl) {
         if (rawUrl == null || rawUrl.trim().isEmpty()) {
             return null;
         }
@@ -92,4 +92,17 @@ public class Crawler {
         }
     }
 
+    private Map<String, String> extractUrl(Document doc) {
+        Map<String, String> results = new HashMap<>();
+        for (Element a : doc.select("a[href]")) {
+            String absoluteUrl = a.attr("abs:href");
+            String cleanedUrl = normalizeUrl(absoluteUrl);
+            if (cleanedUrl == null)
+                continue;
+
+            String anchorText = a.text().trim();
+            results.put(cleanedUrl, anchorText);
+        }
+        return results;
+    }
 }

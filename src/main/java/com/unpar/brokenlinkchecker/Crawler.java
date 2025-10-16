@@ -1,55 +1,62 @@
-package com.unpar.brokenlinkchecker.core;
+package com.unpar.brokenlinkchecker;
 
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
+import java.net.IDN;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.time.Duration;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.unpar.brokenlinkchecker.v1.CrawlStatus;
-
-import java.net.*;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.*;
-import java.util.function.Consumer;
-
 public class Crawler {
     private final String rootHost;
-    private final Frontier frontier;
     private final Set<String> repositories;
-
-    private volatile boolean running = false;
-    private static final int TIMEOUT = 10000;
-
-    private static final HttpClient HTTP_CLIENT = HttpClient
-            .newBuilder()
-            .followRedirects(HttpClient.Redirect.NORMAL) // otomatis follow redirect (301,302,dll)
-            .connectTimeout(Duration.ofMillis(TIMEOUT)) // set timeout koneksi
-            .version(HttpClient.Version.HTTP_1_1) // set versi HTTP ke 1.1
-            .build();
+    private final Queue<String> frontier;
 
     private static final String USER_AGENT = "BrokenLinkChecker/1.0 (+https://github.com/jakeschr/broken-link-checker; contact: 6182001060@student.unpar.ac.id)";
+    private static final int TIMEOUT = 10000;
+    private static final HttpClient HTTP_CLIENT = HttpClient
+            .newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .connectTimeout(Duration.ofMillis(TIMEOUT))
+            .version(HttpClient.Version.HTTP_1_1)
+            .build();
 
     public Crawler(String seedUrl) {
         this.rootHost = URI.create(seedUrl).getHost().toLowerCase();
         this.repositories = new HashSet<>();
-        this.frontier = new Frontier();
+        this.frontier = new ArrayDeque<>();
 
-        frontier.enqueue(seedUrl);
+        frontier.offer(seedUrl);
     }
 
     public void start() {
+        while (!frontier.isEmpty()) {
 
+            // Ambil URL paling depan
+            String webpageUrl = frontier.poll();
+
+            // Skip kalau URL sudah di cek
+            if (!repositories.add(webpageUrl)) {
+                continue;
+            }
+
+
+        }
     }
 
     public void stop() {
 
     }
 
-    public static String normalizeUrl(String rawUrl) {
+    private String normalizeUrl(String rawUrl) {
         if (rawUrl == null || rawUrl.trim().isEmpty()) {
             return null;
         }
@@ -105,22 +112,21 @@ public class Crawler {
         }
     }
 
-    private Map<String, String> extractLinks(Document doc) {
+    private Map<String, String> extractUrl(Document doc) {
         Map<String, String> results = new HashMap<>();
-
         for (Element a : doc.select("a[href]")) {
             String absoluteUrl = a.attr("abs:href");
-
             String cleanedUrl = normalizeUrl(absoluteUrl);
-
             if (cleanedUrl == null)
                 continue;
 
             String anchorText = a.text().trim();
             results.put(cleanedUrl, anchorText);
         }
-
         return results;
     }
 
+    private int fetchUrl(String url) {
+        return 0;
+    }
 }
