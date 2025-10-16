@@ -9,8 +9,6 @@ module com.unpar.brokenlinkchecker {
     requires java.desktop;
 
     opens com.unpar.brokenlinkchecker to javafx.fxml;
-    opens com.unpar.brokenlinkchecker.v4 to javafx.fxml;
 
     exports com.unpar.brokenlinkchecker;
-    exports com.unpar.brokenlinkchecker.v4;
 }

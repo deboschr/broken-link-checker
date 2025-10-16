@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker.v5;
+package com.unpar.brokenlinkchecker.util;
 
 import java.util.HashMap;
 import java.util.Map;

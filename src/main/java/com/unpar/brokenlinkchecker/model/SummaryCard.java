@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker.v3;
+package com.unpar.brokenlinkchecker.model;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
