@@ -1,5 +1,6 @@
 package com.unpar.brokenlinkchecker.graph;
 
+
 import java.util.Objects;
 
 /**
