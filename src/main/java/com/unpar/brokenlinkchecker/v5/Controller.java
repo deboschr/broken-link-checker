@@ -1,4 +1,4 @@
-package com.unpar.brokenlinkchecker;
+package com.unpar.brokenlinkchecker.v5;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -15,9 +15,9 @@ import java.awt.Desktop;
 import java.net.URI;
 import java.time.Instant;
 
-import com.unpar.brokenlinkchecker.model.BrokenLink;
-import com.unpar.brokenlinkchecker.model.CheckingStatus;
-
+/**
+ * Controller utama untuk UI Broken Link Checker
+ */
 public class Controller {
 
    @FXML
@@ -29,21 +29,31 @@ public class Controller {
    @FXML
    private Button minimizeBtn, maximizeBtn, closeBtn;
 
-   // Input + Control Button
+   // Input + Control
    @FXML
    private TextField seedUrlField;
    @FXML
-   private Button startBtn, stopBtn, exportBtn;
+   private Button startBtn, stopBtn;
 
    // Summary
    @FXML
-   private Label checkingStatusLabel, totalLinksLabel, webpageLinksLabel, brokenLinksLabel;
+   private Label checkingStatusLabel;
+   @FXML
+   private Label totalLinksLabel;
+   @FXML
+   private Label webpageLinksLabel;
+   @FXML
+   private Label brokenLinksLabel;
 
    // Result Table
    @FXML
    private TableView<BrokenLink> resultTable;
    @FXML
-   private TableColumn<BrokenLink, String> statusColumn, urlColumn;
+   private TableColumn<BrokenLink, String> statusColumn;
+   @FXML
+   private TableColumn<BrokenLink, String> urlColumn;
+   @FXML
+   private Button exportBtn;
 
    // Pagination
    @FXML
