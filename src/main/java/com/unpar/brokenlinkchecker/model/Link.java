@@ -10,6 +10,7 @@ import com.unpar.brokenlinkchecker.util.HttpStatus;
 public class Link {
 
    private final StringProperty url;
+   private final StringProperty finalUrl;
    private final IntegerProperty statusCode;
    private final ObjectProperty<Instant> accessTime;
    private final StringProperty contentType;
@@ -17,8 +18,9 @@ public class Link {
 
    private final Map<Link, String> connections;
 
-   public Link(String url, int statusCode, Instant accessTime, String contentType, String error) {
+   public Link(String url, String finalUrl, int statusCode, String contentType, String error, Instant accessTime) {
       this.url = new SimpleStringProperty(url);
+      this.finalUrl = new SimpleStringProperty(finalUrl);
       this.statusCode = new SimpleIntegerProperty(statusCode);
       this.accessTime = new SimpleObjectProperty<>(accessTime);
       this.contentType = new SimpleStringProperty(contentType);
@@ -41,6 +43,20 @@ public class Link {
 
    public StringProperty urlProperty() {
       return url;
+   }
+
+   // ===============================================================================
+   // Final URL
+   public String getFinalUrl() {
+      return finalUrl.get();
+   }
+
+   public void setFinalUrl(String value) {
+      finalUrl.set(value);
+   }
+
+   public StringProperty finalUrlProperty() {
+      return finalUrl;
    }
 
    // ===============================================================================

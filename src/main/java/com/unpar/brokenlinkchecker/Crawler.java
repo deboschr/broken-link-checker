@@ -23,7 +23,7 @@ import com.unpar.brokenlinkchecker.model.Link;
 public class Crawler {
     private final String rootHost;
     private final Set<Link> links;
-    private final Queue<String> frontier;
+    private final Queue<Link> frontier;
     private final Set<String> repositories;
 
     private static final String USER_AGENT = "BrokenLinkChecker/1.0 (+https://github.com/jakeschr/broken-link-checker; contact: 6182001060@student.unpar.ac.id)";
@@ -35,65 +35,69 @@ public class Crawler {
         this.frontier = new ArrayDeque<>();
         this.links = new HashSet<>();
 
-        frontier.offer(seedUrl);
+        frontier.offer(new Link(seedUrl, null, 0, null, null, Instant.now()));
     }
 
     public void start() {
         while (!frontier.isEmpty()) {
 
-            String wpUrl = frontier.poll();
+            Link link = frontier.poll();
 
-            if (!repositories.add(wpUrl)) {
+            if (!repositories.add(link.getUrl())) {
                 continue;
             }
 
-            FetchResult result = fetchUrl(wpUrl);
+            FetchResult result = fetchUrl(link.getUrl(), true);
 
-            if (result.getStatusCode() >= 400 || result.getError() != null) {
-                Link brokenLink = new Link(wpUrl, result.getStatusCode(), Instant.now(), result.getError());
-                links.add(brokenLink);
-                // harusnya di sini kita tambahkan relasi ke parentnya dan strem ke UI
+            Link webpageLink = result.link();
+            Document doc = result.document();
+
+            links.add(webpageLink);
+
+            // Skip dan kirim broken link kalau error
+            if (webpageLink.getStatusCode() >= 400 || webpageLink.getError() != null) {
                 continue;
             }
 
-            // Skip kalau beda host dengan seed url atau bukan HTML
-            String finalHost = getHostUrl(result.getFinalUrl());
-            if (finalHost == null
-                    || !finalHost.equals(rootHost)
-                    || result.getContentType() == null
-                    || !result.getContentType().startsWith("text/html")) {
+            // Skip kalau beda host
+            String finalUrlHost = getHostUrl(webpageLink.getFinalUrl());
+            if (finalUrlHost == null || !finalUrlHost.equals(rootHost)) {
                 continue;
             }
 
-            Document doc = result.getDocument();
-            if (doc == null) {
+            // Skip kalau gak ada doc atau doc ga punya elemen <html>
+            if (doc == null || doc.selectFirst("html") == null) {
                 continue;
             }
 
-            Link webpageLink = new Link(wpUrl, result.getStatusCode(), Instant.now(), result.getError());
             Map<String, String> linksOnWebpage = extractUrl(doc);
+
+            webpageLink.clearConnection();
 
             for (Map.Entry<String, String> entry : linksOnWebpage.entrySet()) {
                 String entryUrl = entry.getKey();
                 String entryAnchorText = entry.getValue();
 
-                String entryHost = getHostUrl(result.getFinalUrl());
+                String entryHost = getHostUrl(entryUrl);
 
                 if (entryHost.equalsIgnoreCase(rootHost)) {
-                    frontier.offer(entryUrl);
+                    Link entryLink = new Link(entryUrl, null, 0, null, null, Instant.now());
+
+                    entryLink.setConnection(webpageLink, entryAnchorText);
+
+                    frontier.offer(entryLink);
                 } else {
                     if (!repositories.add(entryUrl)) {
                         continue;
                     }
 
-                    FetchResult entryResult = fetchUrl(entryUrl);
+                    FetchResult entryRes = fetchUrl(entryUrl, false);
 
-                    if (entryResult.getStatusCode() >= 400 || entryResult.getError() != null) {
-                        Link brokenLink = new Link(entryUrl, entryResult.getStatusCode(), Instant.now(),
-                                entryResult.getError());
-                        links.add(brokenLink);
-                        webpageLink.setConnection(brokenLink, entryAnchorText);
-                        // harusnya abis ini stream ke UI
+                    Link entryLink = entryRes.link();
+
+                    if (entryLink.getStatusCode() >= 400 || entryLink.getError() != null) {
+                        links.add(entryLink);
+                        entryLink.setConnection(entryLink, entryAnchorText);
                     }
 
                 }
@@ -108,31 +112,31 @@ public class Crawler {
 
     }
 
-    private FetchResult fetchUrl(String url) {
+    private FetchResult fetchUrl(String url, Boolean isParseDoc) {
         try {
-            Connection.Response response = Jsoup.connect(url)
+            Connection.Response res = Jsoup.connect(url)
                     .userAgent(USER_AGENT)
                     .timeout(TIMEOUT)
                     .followRedirects(true)
                     .ignoreHttpErrors(true)
                     .execute();
 
-            int status = response.statusCode();
-            String type = response.contentType();
-            String finalUrl = response.url().toString();
+            Link link = new Link(url, res.url().toString(), res.statusCode(), res.contentType(), null, Instant.now());
 
             Document doc = null;
 
-            // hanya parse HTML kalau kontennya HTML
-            if (type != null && type.startsWith("text/html") && status == 200) {
-                doc = response.parse();
+            if (isParseDoc && res.statusCode() == 200) {
+                doc = res.parse();
             }
 
-            return new FetchResult(status, type, finalUrl, doc, null);
+            return new FetchResult(link, doc);
 
         } catch (IOException e) {
-            // Gagal koneksi / timeout / DNS / SSL, dsb.
-            return new FetchResult(0, null, url, null, e.getClass().getSimpleName() + ": " + e.getMessage());
+            // Gagal koneksi / timeout / DNS / SSL, dll.
+
+            Link link = new Link(url, null, 0, null, e.getClass().getSimpleName(), Instant.now());
+
+            return new FetchResult(link, null);
         }
     }
 
@@ -152,7 +156,9 @@ public class Crawler {
 
             String anchorText = a.text().trim();
 
-            results.put(cleanedUrl, anchorText);
+            if (!repositories.contains(cleanedUrl)) {
+                results.put(cleanedUrl, anchorText);
+            }
         }
 
         return results;
