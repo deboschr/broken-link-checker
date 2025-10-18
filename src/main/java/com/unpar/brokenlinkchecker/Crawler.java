@@ -25,36 +25,39 @@ import com.unpar.brokenlinkchecker.model.SummaryCard;
 import javafx.application.Platform;
 
 public class Crawler {
-    private final String rootHost;
-    private final Set<Link> links;
-    private final Queue<Link> frontier;
-    private final Set<String> repositories;
-
     private static final String USER_AGENT = "BrokenLinkChecker/1.0 (+https://github.com/jakeschr/broken-link-checker; contact: 6182001060@student.unpar.ac.id)";
     private static final int TIMEOUT = 10000;
 
-    // ===== Consumer (callback) dari controller =====
+    // callback ke controller buat kirim hasil link (streaming real-time)
     private final Consumer<Link> brokenLinkConsumer;
+
+    // internal state
+    private String rootHost;
+    private final Queue<Link> frontier = new ArrayDeque<>();
+    private final Set<String> repositories = new HashSet<>();
 
     // bisa buat kontrol berhenti manual
     private volatile boolean running = false;
 
-    public Crawler(String seedUrl, Consumer<Link> brokenLinkConsumer) {
-        this.rootHost = getHostUrl(seedUrl);
-        this.repositories = new HashSet<>();
-        this.frontier = new ArrayDeque<>();
-        this.links = new HashSet<>();
-
+    public Crawler(Consumer<Link> brokenLinkConsumer) {
         this.brokenLinkConsumer = brokenLinkConsumer;
-
-        frontier.offer(new Link(seedUrl, null, 0, null, null, Instant.now()));
     }
 
-    public void start() {
-        while (!frontier.isEmpty()) {
+    public void start(String seedUrl) {
+        running = true;
+
+        this.rootHost = getHostUrl(seedUrl);
+        repositories.clear();
+        frontier.clear();
+
+        // masukkan seed ke frontier
+        frontier.offer(new Link(seedUrl, null, 0, null, null, Instant.now()));
+
+        while (running && !frontier.isEmpty()) {
 
             Link link = frontier.poll();
 
+            // Skip kalau sudah pernah dikunjungi
             if (!repositories.add(link.getUrl())) {
                 continue;
             }
@@ -64,10 +67,9 @@ public class Crawler {
             Link webpageLink = result.link();
             Document doc = result.document();
 
-            links.add(webpageLink);
-
             // Skip dan kirim broken link kalau error
             if (webpageLink.getStatusCode() >= 400 || webpageLink.getError() != null) {
+                sendBrokenLink(webpageLink);
                 continue;
             }
 
@@ -77,13 +79,14 @@ public class Crawler {
                 continue;
             }
 
-            // Skip kalau gak ada doc atau doc ga punya elemen <html>
+            // Skip kalau dokumen kosong atau bukan HTML
             if (doc == null || doc.selectFirst("html") == null) {
                 continue;
             }
 
             Map<String, String> linksOnWebpage = extractUrl(doc);
 
+            // Hapus koneksi WebpageLink dengan parentnya
             webpageLink.clearConnection();
 
             for (Map.Entry<String, String> entry : linksOnWebpage.entrySet()) {
@@ -92,7 +95,7 @@ public class Crawler {
 
                 String entryHost = getHostUrl(entryUrl);
 
-                if (entryHost.equalsIgnoreCase(rootHost)) {
+                if (entryHost != null && entryHost.equals(rootHost)) {
                     Link entryLink = new Link(entryUrl, null, 0, null, null, Instant.now());
 
                     entryLink.setConnection(webpageLink, entryAnchorText);
@@ -109,7 +112,6 @@ public class Crawler {
 
                     if (entryLink.getStatusCode() >= 400 || entryLink.getError() != null) {
                         entryLink.setConnection(entryLink, entryAnchorText);
-                        links.add(entryLink);
                         sendBrokenLink(entryLink);
                     }
 
@@ -122,10 +124,14 @@ public class Crawler {
     }
 
     public void stop() {
-
+        running = false;
     }
 
-    // kirim hasil link ke UI
+    /**
+     * kirim hasil link ke controller lewat JavaFX thread
+     * 
+     * @param link
+     */
     private void sendBrokenLink(Link link) {
         if (brokenLinkConsumer != null) {
             Platform.runLater(() -> brokenLinkConsumer.accept(link));

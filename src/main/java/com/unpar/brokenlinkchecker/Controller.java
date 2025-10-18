@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 
 import java.awt.Desktop;
 import java.net.URI;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import com.unpar.brokenlinkchecker.model.*;
 
@@ -44,6 +46,8 @@ public class Controller {
    private TableColumn<Link, String> statusColumn, urlColumn;
 
    // ============================= FIELDS =============================
+   private Crawler crawler;
+
    private double xOffset = 0;
    private double yOffset = 0;
 
@@ -59,6 +63,10 @@ public class Controller {
          initTitleBar();
          initResultTable();
          initSummaryCard();
+
+         crawler = new Crawler(brokenLink -> {
+            brokenLinks.add(brokenLink);
+         });
       });
    }
 
@@ -67,23 +75,18 @@ public class Controller {
    private void onStartClick() {
       String seedUrl = seedUrlField.getText().trim();
 
+      String validated = validateSeedUrl(seedUrl);
+
+      if (validated == null) {
+         showAlert("Invalid URL. Please enter a valid URL.");
+         return;
+      }
+
       // kosongkan data lama
       brokenLinks.clear();
 
       // buat crawler dan kirim consumer
-      Crawler crawler = new Crawler(
-            seedUrl,
-            link -> brokenLinks.add(link), // update tabel real-time
-            summary -> { // update summary real-time
-               checkingStatusLabel.setText(summary.getCheckingStatus().getText());
-               totalLinksLabel.setText(String.valueOf(summary.getTotalLinks()));
-               webpageLinksLabel.setText(String.valueOf(summary.getWebpages()));
-               brokenLinksLabel.setText(String.valueOf(summary.getBrokenLinks()));
-            },
-            summaryCard);
 
-      // jalankan di thread terpisah
-      new Thread(crawler::start).start();
    }
 
    @FXML
@@ -201,4 +204,105 @@ public class Controller {
       alert.setContentText(message);
       alert.showAndWait();
    }
+
+   /**
+    * Validasi dan normalisasi seed URL.
+    * 
+    * Aturan:
+    * 1. Wajib punya scheme (http / https)
+    * 2. Wajib punya host
+    * 3. Hapus port jika default (80 untuk http, 443 untuk https)
+    * 4. Bersihkan path dari dot-segment (., ..)
+    * 5. Hapus fragment (#...)
+    * 
+    * @param rawUrl input mentah dari TextField
+    * @return URL yang sudah divalidasi dan dinormalisasi, atau null jika tidak
+    *         valid
+    */
+   private String validateSeedUrl(String rawUrl) {
+      if (rawUrl == null || rawUrl.isBlank())
+         return null;
+
+      try {
+         // tambahkan skema default jika user lupa (misal "example.com" →
+         // "http://example.com")
+         if (!rawUrl.matches("(?i)^https?://.*")) {
+            rawUrl = "http://" + rawUrl.trim();
+         }
+
+         URI uri = new URI(rawUrl.trim());
+
+         String scheme = uri.getScheme();
+         String host = uri.getHost();
+         int port = uri.getPort();
+         String path = uri.getRawPath();
+         String query = uri.getRawQuery();
+
+         // ===== validasi dasar =====
+         if (scheme == null || (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https"))) {
+            return null; // skema tidak valid
+         }
+
+         if (host == null || host.isEmpty()) {
+            return null; // host wajib ada
+         }
+
+         // ===== bersihkan port =====
+         if ((scheme.equalsIgnoreCase("http") && port == 80) ||
+               (scheme.equalsIgnoreCase("https") && port == 443)) {
+            port = -1; // hapus port default
+         }
+
+         // ===== bersihkan path (dot segment) =====
+         path = normalizePath(path);
+
+         // ===== rakit ulang tanpa fragment =====
+         URI cleaned = new URI(
+               scheme.toLowerCase(),
+               null,
+               host.toLowerCase(),
+               port,
+               path,
+               query,
+               null // fragment dihapus
+         );
+
+         return cleaned.toASCIIString();
+
+      } catch (Exception e) {
+         return null; // URL tidak valid
+      }
+   }
+
+   /**
+    * Bersihkan dot-segment (., ..) dari path sesuai RFC 3986 Section 5.2.4
+    */
+   private String normalizePath(String path) {
+      if (path == null || path.isEmpty()) {
+         return "/";
+      }
+
+      Deque<String> segments = new ArrayDeque<>();
+
+      for (String part : path.split("/")) {
+         if (part.equals("") || part.equals(".")) {
+            continue;
+         } else if (part.equals("..")) {
+            if (!segments.isEmpty()) {
+               segments.removeLast();
+            }
+         } else {
+            segments.add(part);
+         }
+      }
+
+      StringBuilder sb = new StringBuilder();
+
+      for (String seg : segments) {
+         sb.append("/").append(seg);
+      }
+
+      return sb.isEmpty() ? "/" : sb.toString();
+   }
+
 }
