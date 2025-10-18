@@ -1,6 +1,8 @@
 package com.unpar.brokenlinkchecker;
 
-import java.io.IOException;
+import com.unpar.brokenlinkchecker.model.Link;
+import com.unpar.brokenlinkchecker.model.FetchResult;
+
 import java.net.IDN;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,31 +13,30 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import org.jsoup.Connection;
+import javafx.application.Platform;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.unpar.brokenlinkchecker.model.Link;
-import com.unpar.brokenlinkchecker.model.FetchResult;
-
-import javafx.application.Platform;
-
 public class Crawler {
     private static final String USER_AGENT = "BrokenLinkChecker/1.0 (+https://github.com/jakeschr/broken-link-checker; contact: 6182001060@student.unpar.ac.id)";
     private static final int TIMEOUT = 10000;
+    private static final OkHttpClient OK_HTTP = new OkHttpClient.Builder()
+            .followRedirects(true)
+            .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+            .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+            .build();
 
-    // callback ke controller buat kirim hasil link (streaming real-time)
     private final Consumer<Link> brokenLinkConsumer;
-
-    // internal state
     private String rootHost;
     private final Queue<Link> frontier = new ArrayDeque<>();
     private final Set<String> repositories = new HashSet<>();
-
-    // untuk kontrol proses
     private volatile boolean running = false;
 
     public Crawler(Consumer<Link> brokenLinkConsumer) {
@@ -126,40 +127,42 @@ public class Crawler {
         running = false;
     }
 
-    /**
-     * kirim hasil link ke controller lewat JavaFX thread
-     * 
-     * @param link
-     */
-    private void sendBrokenLink(Link link) {
-        if (brokenLinkConsumer != null) {
-            Platform.runLater(() -> brokenLinkConsumer.accept(link));
-        }
-    }
-
     private FetchResult fetchUrl(String url, Boolean isParseDoc) {
         try {
-            Connection.Response res = Jsoup.connect(url)
-                    .userAgent(USER_AGENT)
-                    .timeout(TIMEOUT)
-                    .followRedirects(true)
-                    .ignoreHttpErrors(true)
-                    .execute();
+            Request request = new Request.Builder()
+                    .url(url)
+                    .header("User-Agent", USER_AGENT)
+                    .get()
+                    .build();
 
-            Link link = new Link(url, res.url().toString(), res.statusCode(), res.contentType(), null, Instant.now());
+            try (Response res = OK_HTTP.newCall(request).execute()) {
 
-            Document doc = null;
+                Document doc = null;
 
-            if (isParseDoc && res.statusCode() == 200) {
-                doc = res.parse();
+                String contentType = res.header("Content-Type", "");
+                boolean isHtml = contentType != null && contentType.toLowerCase().contains("text/html");
+
+                if (isParseDoc && res.code() == 200 && isHtml && res.body() != null) {
+                    try {
+                        String html = res.body().string();
+
+                        doc = Jsoup.parse(html, res.request().url().toString());
+                    } catch (Exception parseErr) {
+                        doc = null;
+                    }
+                }
+
+                Link link = new Link(url, res.request().url().toString(), res.code(), contentType, null, Instant.now());
+                return new FetchResult(link, doc);
             }
 
-            return new FetchResult(link, doc);
+        } catch (Throwable e) {
+            String errorName = e.getClass().getSimpleName();
+            if (errorName == null || errorName.isBlank()) {
+                errorName = "UnknownError";
+            }
 
-        } catch (IOException e) {
-            // Gagal koneksi / timeout / DNS / SSL, dll.
-
-            Link link = new Link(url, null, 0, null, e.getClass().getSimpleName(), Instant.now());
+            Link link = new Link(url, null, 0, null, errorName, Instant.now());
 
             return new FetchResult(link, null);
         }
@@ -260,6 +263,12 @@ public class Crawler {
         } catch (IllegalArgumentException e) {
             // URL tidak valid secara sintaks
             return null;
+        }
+    }
+
+    private void sendBrokenLink(Link link) {
+        if (brokenLinkConsumer != null) {
+            Platform.runLater(() -> brokenLinkConsumer.accept(link));
         }
     }
 

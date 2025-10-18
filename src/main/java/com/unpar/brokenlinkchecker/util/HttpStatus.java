@@ -56,12 +56,12 @@ public class HttpStatus {
         STATUS_MAP.put(511, "511 Network Authentication Required");
     }
 
-    /**
-     * Akan mengembalikan status code + reason phrase berdasarkan key (status code)
-     * yang dikirim, dan akan mengembalikan status code itu sendiri (default) kalau
-     * tidak ada di map.
-     */
     public static String getStatus(int statusCode) {
+        // kalau 1xx, 2xx & 3xx maka artinya bukan error, jadi return null
+        if (statusCode >= 100 && statusCode < 400) {
+            return null;
+        }
+
         return STATUS_MAP.getOrDefault(statusCode, String.valueOf(statusCode));
     }
 }
