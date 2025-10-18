@@ -38,8 +38,8 @@
             <!-- ===================== INPUT & CONTROLL BUTTON ===================== -->
             <HBox fx:id="inputContainer" spacing="10" alignment="CENTER_LEFT" styleClass="input-wrapper">
                 <TextField fx:id="seedUrlField" promptText="Enter Seed URL..." HBox.hgrow="ALWAYS" styleClass="input-field"/>
-                <Button fx:id="startBtn" text="Start" styleClass="btn-control"/>
-                <Button fx:id="stopBtn" text="Stop" styleClass="btn-control"/>
+                <Button fx:id="startBtn" text="Start" styleClass="btn-control" onAction="#onStartClick"/>
+                <Button fx:id="stopBtn" text="Stop" styleClass="btn-control" onAction="#onStopClick"/>
             </HBox>
 
             <!-- ===================== SUMMARY & FILTERS ===================== -->
@@ -129,7 +129,7 @@
                 <HBox alignment="CENTER_LEFT" spacing="8">
                     <Label text="Result" styleClass="section-title"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Button fx:id="exportButton" text="Export" styleClass="btn-control"/>
+                    <Button fx:id="exportButton" text="Export" styleClass="btn-control" onAction="#onExportClick"/>
                 </HBox>
 
                 <!-- ====== TableView ====== -->
