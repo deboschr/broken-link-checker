@@ -19,7 +19,7 @@ import com.unpar.brokenlinkchecker.model.*;
 
 public class Controller {
 
-   // ============================= FXML BINDINGS =============================
+   // ============================= FXML =============================
    @FXML
    private BorderPane root;
 
@@ -75,9 +75,9 @@ public class Controller {
    private void onStartClick() {
       String seedUrl = seedUrlField.getText().trim();
 
-      String validated = validateSeedUrl(seedUrl);
+      String cleanedSeedUrl = validateSeedUrl(seedUrl);
 
-      if (validated == null) {
+      if (cleanedSeedUrl == null) {
          showAlert("Invalid URL. Please enter a valid URL.");
          return;
       }
@@ -85,13 +85,22 @@ public class Controller {
       // kosongkan data lama
       brokenLinks.clear();
 
-      // buat crawler dan kirim consumer
+      // update summary card
+      summaryCard.setCheckingStatus(CheckingStatus.CHECKING);
+      summaryCard.setTotalLinks(0);
+      summaryCard.setWebpages(0);
+      summaryCard.setBrokenLinks(0);
 
+      // jalanin di thread background
+      new Thread(() -> crawler.start(cleanedSeedUrl)).start();
    }
 
    @FXML
    private void onStopClick() {
-      summaryCard.setCheckingStatus(CheckingStatus.STOPPED);
+      if (crawler != null) {
+         crawler.stop();
+         summaryCard.setCheckingStatus(CheckingStatus.STOPPED);
+      }
    }
 
    @FXML
@@ -197,7 +206,7 @@ public class Controller {
       });
    }
 
-   // ============================= UTIL =============================
+   // ============================= UTILS =============================
    private void showAlert(String message) {
       Alert alert = new Alert(Alert.AlertType.INFORMATION);
       alert.setHeaderText(null);

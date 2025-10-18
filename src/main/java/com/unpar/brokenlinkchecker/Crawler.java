@@ -20,7 +20,6 @@ import org.jsoup.nodes.Element;
 
 import com.unpar.brokenlinkchecker.model.Link;
 import com.unpar.brokenlinkchecker.model.FetchResult;
-import com.unpar.brokenlinkchecker.model.SummaryCard;
 
 import javafx.application.Platform;
 
@@ -36,7 +35,7 @@ public class Crawler {
     private final Queue<Link> frontier = new ArrayDeque<>();
     private final Set<String> repositories = new HashSet<>();
 
-    // bisa buat kontrol berhenti manual
+    // untuk kontrol proses
     private volatile boolean running = false;
 
     public Crawler(Consumer<Link> brokenLinkConsumer) {
