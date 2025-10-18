@@ -98,8 +98,10 @@ public class Crawler {
                 if (entryHost != null && entryHost.equals(rootHost)) {
                     Link entryLink = new Link(entryUrl, null, 0, null, null, Instant.now());
 
+                    // Set koneksi ke parentnya
                     entryLink.setConnection(webpageLink, entryAnchorText);
 
+                    // Masukan ke antrian
                     frontier.offer(entryLink);
                 } else {
                     if (!repositories.add(entryUrl)) {
