@@ -11,14 +11,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import com.unpar.brokenlinkchecker.model.FetchResult;
 import com.unpar.brokenlinkchecker.model.Link;
+import com.unpar.brokenlinkchecker.model.FetchResult;
+import com.unpar.brokenlinkchecker.model.SummaryCard;
+
+import javafx.application.Platform;
 
 public class Crawler {
     private final String rootHost;
@@ -29,11 +33,19 @@ public class Crawler {
     private static final String USER_AGENT = "BrokenLinkChecker/1.0 (+https://github.com/jakeschr/broken-link-checker; contact: 6182001060@student.unpar.ac.id)";
     private static final int TIMEOUT = 10000;
 
-    public Crawler(String seedUrl) {
+    // ===== Consumer (callback) dari controller =====
+    private final Consumer<Link> brokenLinkConsumer;
+
+    // bisa buat kontrol berhenti manual
+    private volatile boolean running = false;
+
+    public Crawler(String seedUrl, Consumer<Link> brokenLinkConsumer) {
         this.rootHost = getHostUrl(seedUrl);
         this.repositories = new HashSet<>();
         this.frontier = new ArrayDeque<>();
         this.links = new HashSet<>();
+
+        this.brokenLinkConsumer = brokenLinkConsumer;
 
         frontier.offer(new Link(seedUrl, null, 0, null, null, Instant.now()));
     }
@@ -96,8 +108,9 @@ public class Crawler {
                     Link entryLink = entryRes.link();
 
                     if (entryLink.getStatusCode() >= 400 || entryLink.getError() != null) {
-                        links.add(entryLink);
                         entryLink.setConnection(entryLink, entryAnchorText);
+                        links.add(entryLink);
+                        sendBrokenLink(entryLink);
                     }
 
                 }
@@ -110,6 +123,13 @@ public class Crawler {
 
     public void stop() {
 
+    }
+
+    // kirim hasil link ke UI
+    private void sendBrokenLink(Link link) {
+        if (brokenLinkConsumer != null) {
+            Platform.runLater(() -> brokenLinkConsumer.accept(link));
+        }
     }
 
     private FetchResult fetchUrl(String url, Boolean isParseDoc) {

@@ -42,7 +42,6 @@
                 <Button fx:id="stopBtn" text="Stop" styleClass="btn-control"/>
             </HBox>
 
-
             <!-- ===================== SUMMARY & FILTERS ===================== -->
             <GridPane hgap="16" VBox.vgrow="ALWAYS">
                 <columnConstraints>
